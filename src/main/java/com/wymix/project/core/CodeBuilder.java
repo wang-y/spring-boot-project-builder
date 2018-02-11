@@ -548,7 +548,7 @@ public final class CodeBuilder {
             writer.write("        <dependency>\n");
             writer.write("            <groupId>org.apache.commons</groupId>\n");
             writer.write("            <artifactId>commons-lang3</artifactId>\n");
-            writer.write("            <version>3.6</version>\n");
+            writer.write("            <version>3.7</version>\n");
             writer.write("        </dependency>\n");
 
             writer.write("        <dependency>\n");
@@ -561,7 +561,7 @@ public final class CodeBuilder {
             writer.write("        <dependency>\n");
             writer.write("            <groupId>com.google.guava</groupId>\n");
             writer.write("            <artifactId>guava</artifactId>\n");
-            writer.write("            <version>23.0</version>\n");
+            writer.write("            <version>24.0-jre</version>\n");
             writer.write("        </dependency>\n");
 
             writer.write("    </dependencies>\n\n");

@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSON;
 public class Result<T> {
     private int code=200;
     private String message;
-    private Object data;
+    private T data;
 
     public Result() {
     }
@@ -40,11 +40,11 @@ public class Result<T> {
         return this;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public Result setData(Object data) {
+    public Result setData(T data) {
         this.data = data;
         return this;
     }

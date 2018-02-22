@@ -10,7 +10,7 @@ import org.hibernate.transform.Transformers;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -18,7 +18,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.*;
 
-public class BasicRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
+public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepository<T, ID>
         implements IBasicRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> information;
@@ -31,7 +31,7 @@ public class BasicRepository<T, ID extends Serializable> extends SimpleJpaReposi
     /**
      * 构造函数
      */
-    public BasicRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    public BasicRepository(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.information = entityInformation;
         this.em = entityManager;
@@ -46,11 +46,14 @@ public class BasicRepository<T, ID extends Serializable> extends SimpleJpaReposi
         return result;
     }
 
+    @Override
     protected CrudMethodMetadata getRepositoryMethodMetadata() {
         return metadata;
     }
 
+    @Override
     public void setRepositoryMethodMetadata(CrudMethodMetadata crudMethodMetadata) {
+        super.setRepositoryMethodMetadata(crudMethodMetadata);
         this.metadata = crudMethodMetadata;
     }
 

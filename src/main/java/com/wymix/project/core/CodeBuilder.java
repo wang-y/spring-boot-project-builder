@@ -587,6 +587,17 @@ public final class CodeBuilder {
             writer.write("            <version>24.0-jre</version>\n");
             writer.write("        </dependency>\n");
 
+            writer.write("        <dependency>\n");
+            writer.write("            <groupId>com.querydsl</groupId>\n");
+            writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
+            writer.write("        </dependency>\n");
+
+            writer.write("        <dependency>\n");
+            writer.write("            <groupId>com.querydsl</groupId>\n");
+            writer.write("            <artifactId>querydsl-apt</artifactId>\n");
+            writer.write("            <scope>provided</scope>\n");
+            writer.write("        </dependency>\n");
+
             writer.write("    </dependencies>\n\n");
 
             writer.write("    <build>\n");
@@ -622,6 +633,22 @@ public final class CodeBuilder {
             writer.write("                    <source>${java.version}</source>\n");
             writer.write("                    <target>${java.version}</target>\n");
             writer.write("                </configuration>\n");
+            writer.write("            </plugin>\n");
+            writer.write("            <plugin>\n");
+            writer.write("                <groupId>com.mysema.maven</groupId>\n");
+            writer.write("                <artifactId>apt-maven-plugin</artifactId>\n");
+            writer.write("                <version>1.1.3</version>\n");
+            writer.write("                <executions>\n");
+            writer.write("                    <execution>\n");
+            writer.write("                        <goals>\n");
+            writer.write("                            <goal>process</goal>\n");
+            writer.write("                        </goals>\n");
+            writer.write("                        <configuration>\n");
+            writer.write("                            <outputDirectory>target/generated-sources/java</outputDirectory>\n");
+            writer.write("                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>\n");
+            writer.write("                        </configuration>\n");
+            writer.write("                    </execution>\n");
+            writer.write("                </executions>\n");
             writer.write("            </plugin>\n");
             writer.write("        </plugins>\n");
             writer.write("    </build>");

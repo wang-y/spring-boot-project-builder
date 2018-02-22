@@ -52,7 +52,7 @@ public class JpaRepositoryFactory extends RepositoryFactorySupport {
         return repository;
     }
 
-    protected <T, ID extends Serializable> BasicRepository<?, ?> getTargetRepository(
+    protected <T, ID extends Serializable> BasicRepository<T, ID> getTargetRepository(
             RepositoryInformation information, EntityManager entityManager) {
 
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
@@ -62,17 +62,7 @@ public class JpaRepositoryFactory extends RepositoryFactorySupport {
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-
-        if (isQueryDslExecutor(metadata.getRepositoryInterface())) {
-            return QueryDslJpaRepository.class;
-        } else {
-            return BasicRepository.class;
-        }
-    }
-
-    private boolean isQueryDslExecutor(Class<?> repositoryInterface) {
-
-        return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
+        return BasicRepository.class;
     }
 
     @Override

@@ -32,3 +32,5 @@ public static void main(String[] args) {
 //      genCode("test_table","Tt","Long");  //指定 表名(test_table),自定义类名(tt), 主键类型(Long);
     }
 ```
+
+因该项目引入了QueryDSL，所以在生成代码后 执行 _mvn clean compile_  生成Q结构查询实体

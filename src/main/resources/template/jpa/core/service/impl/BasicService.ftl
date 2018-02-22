@@ -2,6 +2,7 @@ package ${corepackage}.service.impl;
 
 import ${corepackage}.page.SimplePage;
 import ${corepackage}.repo.IBasicRepository;
+import ${corepackage}.service.IBasicService;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public abstract class BasicService<V extends Serializable, E extends Serializable, ID extends Serializable> implements com.wymix.demo.core.service.IBasicService<V, E, ID> {
+public abstract class BasicService<V extends Serializable, E extends Serializable, ID extends Serializable> implements IBasicService<V, E, ID> {
 
     private Class<E> entityClass;
 

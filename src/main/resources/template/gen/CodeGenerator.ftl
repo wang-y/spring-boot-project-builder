@@ -290,7 +290,7 @@ public class CodeGenerator {
             data.put("modelName", modelName);
             data.put("PKType", pkType);
 
-            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("com.wymix.demo.business.web")+modelName+"Controller.java");
+            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("${basepackage}.business.web")+modelName+"Controller.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
@@ -308,13 +308,13 @@ public class CodeGenerator {
             data.put("modelName", modelName);
             data.put("PKType", pkType);
 
-            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("com.wymix.demo.business.service")+modelName+"Service.java");
+            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("${basepackage}.business.service")+modelName+"Service.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
             cfg.getTemplate("service/TemplateService.ftl").process(data, new FileWriter(file));
 
-            file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("com.wymix.demo.business.service.impl")+modelName+"ServiceImpl.java");
+            file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("${basepackage}.business.service.impl")+modelName+"ServiceImpl.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
@@ -332,7 +332,7 @@ public class CodeGenerator {
             data.put("modelName", modelName);
             data.put("PKType", pkType);
 
-            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("com.wymix.demo.business.repository")+modelName+"Repository.java");
+            File file = new File(PROJECT_PATH+ "/src/main/java"+ packageConvertPath("${basepackage}.business.repository")+modelName+"Repository.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }

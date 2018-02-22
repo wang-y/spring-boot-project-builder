@@ -19,7 +19,6 @@ public final class CodeBuilder {
 
     private String PACKAGE_PATH_CONF;
     private String PACKAGE_PATH_CORE;
-    private String PACKAGE_PATH_BUSINESS;
 
     private String BASE_PACKAGE_PATH;
 
@@ -81,7 +80,6 @@ public final class CodeBuilder {
 
         PACKAGE_PATH_CONF = packageConvertPath(PACKAGE_CONF);
         PACKAGE_PATH_CORE = packageConvertPath(PACKAGE_CORE);
-        PACKAGE_PATH_BUSINESS = packageConvertPath(PACKAGE_BUSINESS);
         BASE_PACKAGE_PATH = packageConvertPath(BASE_PACKAGE);
 
         touchDir();
@@ -112,6 +110,7 @@ public final class CodeBuilder {
         }
         ///
         copyCodeTemplate();
+        System.out.println("项目创建完毕！");
     }
 
     private void copyCodeTemplate() {
@@ -169,8 +168,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("gen/CodeGenerator.ftl").process(data, new FileWriter(file));
         }catch (Exception e){
+            System.out.println("代码生成器类创建失败！");
             e.printStackTrace();
+            System.exit(0);
         }
+        System.out.println("代码生成器类创建完毕！");
     }
 
     private void copyConfSwaggerJava() {
@@ -187,8 +189,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/conf/SwaggerConf.ftl").process(data, new FileWriter(file));
         }catch (Exception e){
-
+            System.out.println("swagger配置类生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
+        System.out.println("swagger配置类生成完毕！");
     }
 
     private void genJPABusinessLogicCode() {
@@ -212,6 +217,7 @@ public final class CodeBuilder {
         if (!file.exists()) {
             file.mkdirs();
         }
+        System.out.println("JPA业务包创建完毕！");
     }
 
     private void copyCoreCommonJava() {
@@ -245,9 +251,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/PageRequest.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            throw new RuntimeException("通用 核心库 生成失败", e);
+            System.out.println("通用核心库生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
-        System.out.println("通用 核心库 生成完毕！");
+        System.out.println("通用核心库生成完毕！");
     }
 
     private void copyConfCommonJava() {
@@ -263,9 +271,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/conf/WebMvcConfigurer.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            throw new RuntimeException("通用 配置 生成失败", e);
+            System.out.println("通用配置类生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
-        System.out.println("通用 配置 生成完毕！");
+        System.out.println("通用配置类生成完毕！");
     }
 
     private void copyConfJPAJava() {
@@ -280,9 +290,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("jpa/conf/JPAConfig.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            throw new RuntimeException("JPA 配置 生成失败", e);
+            System.out.println("JPA配置类生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
-        System.out.println("JPA 配置 生成完毕！");
+        System.out.println("JPA配置类生成完毕！");
     }
 
     private void copyCoreJPAJava() {
@@ -363,9 +375,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("jpa/core/web/BasicController.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            throw new RuntimeException("JPA 核心包 生成失败", e);
+            System.out.println("JPA核心包生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
-        System.out.println("JPA 核心包 生成完毕！");
+        System.out.println("JPA核心包生成完毕！");
     }
 
     private void createStarter() {
@@ -379,9 +393,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("Application.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            throw new RuntimeException("Application.java 生成失败", e);
+            System.out.println("启动类 Application.java 生成失败！");
+            e.printStackTrace();
+            System.exit(0);
         }
-        System.out.println("Application.java 生成完毕！");
+        System.out.println("启动类 Application.java 生成完毕！");
     }
 
     private void modifyPom() {
@@ -541,6 +557,13 @@ public final class CodeBuilder {
             writer.write("        </dependency>\n");
 
             writer.write("        <dependency>\n");
+            writer.write("            <groupId>org.projectlombok</groupId>\n");
+            writer.write("            <artifactId>lombok</artifactId>\n");
+            writer.write("            <version>1.16.20</version>\n");
+            writer.write("            <scope>provided</scope>\n");
+            writer.write("        </dependency>\n");
+
+            writer.write("        <dependency>\n");
             writer.write("            <groupId>commons-codec</groupId>\n");
             writer.write("            <artifactId>commons-codec</artifactId>\n");
             writer.write("        </dependency>\n");
@@ -608,6 +631,7 @@ public final class CodeBuilder {
 
             System.out.println("pom.xml 依赖引入完毕！");
         } catch (Exception e) {
+            System.out.println("pom.xml 依赖引入失败！");
             e.printStackTrace();
             System.exit(0);
         } finally {
@@ -718,6 +742,7 @@ public final class CodeBuilder {
             writer.flush();
             System.out.println("application.yml 配置完毕！");
         } catch (Exception e) {
+            System.out.println("application.yml 配置失败！");
             e.printStackTrace();
             System.exit(0);
         } finally {
@@ -750,7 +775,7 @@ public final class CodeBuilder {
             e.printStackTrace();
             System.exit(0);
         }
-        System.out.println("项目配置创建完毕！");
+        System.out.println("项目配置文件创建完毕！");
     }
 
     private void touchDir() {

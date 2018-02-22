@@ -138,6 +138,7 @@ public class CodeGenerator {
     private static String buildEntity(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, String modelname, boolean f_util, boolean f_sql) {
         StringBuffer sb = new StringBuffer();
         sb.append("package ${businesspackage}.model;\r\n\r\n");
+        sb.append("import lombok.Data;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         sb.append("import javax.persistence.*;\r\n");
         // 判断是否导入工具包
@@ -154,11 +155,12 @@ public class CodeGenerator {
 
         sb.append(" */\r\n");
         // 实体部分
+        sb.append("\r\n@Data");
         sb.append("\r\n@Entity");
         sb.append("\r\n@Table(name = \"" + tableName + "\")");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(StringUtils.isNotBlank(modelname) ? modelname : tableName) + " implements Serializable {\r\n\r\n");
         processAllAttrs(sb, colnames, colTypes, colKeys, extras);// 属性
-        processAllMethod(sb, colnames, colTypes);// get set方法
+        //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
         // System.out.println(sb.toString());
@@ -168,6 +170,7 @@ public class CodeGenerator {
     private static String buildVo(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, boolean f_util) {
         StringBuffer sb = new StringBuffer();
         sb.append("package ${businesspackage}.vo;\r\n\r\n");
+        sb.append("import lombok.Data;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         // 判断是否导入工具包
         if (f_util) {
@@ -181,9 +184,10 @@ public class CodeGenerator {
 
         sb.append(" */\r\n");
         // 实体部分
+        sb.append("\r\n@Data");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(tableName) + "Vo implements Serializable {\r\n\r\n");
         processAllAttrs2(sb, colnames, colTypes, colKeys, extras);// 属性
-        processAllMethod(sb, colnames, colTypes);// get set方法
+        //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
         // System.out.println(sb.toString());

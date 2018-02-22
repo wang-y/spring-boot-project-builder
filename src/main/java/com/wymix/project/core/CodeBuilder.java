@@ -142,6 +142,7 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("jpa/business/service/impl/TemplateServiceImpl.ftl").process(data, new FileWriter(file));
 
+            data.put("model", "${modelName?lower_case}");
             file = new File(getTestResourcesPath()  + "generator/template/web/TemplateController.ftl");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

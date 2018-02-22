@@ -6,6 +6,7 @@ import freemarker.template.TemplateExceptionHandler;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +56,10 @@ public final class CodeBuilder {
         return getRoot() + "/src/main/java/";
     }
 
+    private String getResourcePath() {
+        return getRoot() + "/src/main/resources/";
+    }
+
     private String getTestJavaPath() {
         return getRoot() + "/src/test/java/";
     }
@@ -70,6 +75,17 @@ public final class CodeBuilder {
     }
 
     public void build(ProjectConfig projectConfig) {
+        System.out.println("               _");
+        System.out.println("         __  _(_) ___ __ _ _   ___      __");
+        System.out.println("         \\ \\/ / |/ _ ' _` | | | \\ \\ /\\ / /");
+        System.out.println("          >  <| | | | | | | |_| |\\ V  V /");
+        System.out.println("         /_/\\_\\_|_| |_| |_| .__/  \\_/\\_/");
+        System.out.println("                           \\___|");
+        System.out.println("-----------------------------------------------------");
+        System.out.println("https://github.com/wang-y/spring-boot-project-builder");
+        System.out.println("-----------------------------------------------------");
+        System.out.println("                                           (欢迎fork)");
+
         this.projectConfig = projectConfig;
         String basepackage = "com." + projectConfig.company + "." + projectConfig.project;
 
@@ -110,7 +126,23 @@ public final class CodeBuilder {
         }
         ///
         copyCodeTemplate();
+        copyBanner();
         System.out.println("项目创建完毕！");
+    }
+
+    private void copyBanner() {
+        try {
+            File file = new File(getResourcePath()  + "banner.txt");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            Files.copy(new File(TEMPLATE_FILE_PATH+"/banner.txt").toPath(), file.toPath());
+        }catch (Exception e){
+            System.out.println("banner生成失败！");
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.println("banner生成完毕！");
     }
 
     private void copyCodeTemplate() {

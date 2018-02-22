@@ -1,0 +1,13 @@
+${AnsiColor.BRIGHT_YELLOW}               _
+         __  _(_) ___ __ _ _   ___      __
+         \ \/ / |/ _ ' _` | | | \ \ /\ / /
+          >  <| | | | | | | |_| |\ V  V /
+         /_/\_\_|_| |_| |_| .__/  \_/\_/
+                           \___|
+${AnsiColor.BRIGHT_RED}
+Application Version: ${application.version}
+Spring Boot Version: ${spring-boot.version}
+${AnsiColor.BRIGHT_YELLOW}-----------------------------------------------------
+https://github.com/wang-y/spring-boot-project-builder
+-----------------------------------------------------
+                                           (欢迎fork)

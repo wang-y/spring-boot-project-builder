@@ -136,7 +136,12 @@ public final class CodeBuilder {
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            Files.copy(new File(TEMPLATE_FILE_PATH+"/banner.txt").toPath(), file.toPath());
+            try {
+                Files.copy(new File(TEMPLATE_FILE_PATH+"/banner.txt").toPath(), file.toPath());
+            }catch (Exception e){
+                System.out.println("banner已存在！");
+            }
+
         }catch (Exception e){
             System.out.println("banner生成失败！");
             e.printStackTrace();

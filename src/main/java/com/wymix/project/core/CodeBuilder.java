@@ -194,6 +194,7 @@ public final class CodeBuilder {
             data.put("port", String.valueOf(uri.getPort()));
             data.put("database", uri.getPath().replaceFirst("/",""));
             data.put("businesspackage", PACKAGE_BUSINESS);
+            data.put("enabled_swagger", projectConfig.enable_swagger?"yes":"no");
 
             file = new File(getTestJavaPath() +BASE_PACKAGE_PATH + "CodeGenerator.java");
             if (!file.getParentFile().exists()) {

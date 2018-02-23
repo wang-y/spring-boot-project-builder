@@ -24,6 +24,8 @@ public class CodeGenerator {
     private static final String JAVA_PATH = "/src/main/java/"; //java文件路径
     private static final String RESOURCES_PATH = "/src/main/resources";//资源文件路径
 
+    private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";
+
     public static void main(String[] args) {
         genCode("test_table","Long");
     }
@@ -74,8 +76,8 @@ public class CodeGenerator {
                 }
                 index++;
             }
-            String entitycontent = buildEntity(colnames, colTypes, colKeys, extras, tableName, modelName, f_util, f_sql);
-            String vocontent = buildVo(colnames, colTypes, colKeys, extras, StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util);
+            String entitycontent = buildEntity(colnames, colTypes, colKeys, extras, tableName, modelName, f_util, f_sql,colComments);
+            String vocontent = buildVo(colnames, colTypes, colKeys, extras, StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util,colComments);
 
             String modelPackage = "${businesspackage}.model";
             String voPackage = "${businesspackage}.vo";
@@ -135,7 +137,7 @@ public class CodeGenerator {
         }
     }
 
-    private static String buildEntity(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, String modelname, boolean f_util, boolean f_sql) {
+    private static String buildEntity(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, String modelname, boolean f_util, boolean f_sql,String[] colComments) {
         StringBuffer sb = new StringBuffer();
         sb.append("package ${businesspackage}.model;\r\n\r\n");
         sb.append("import lombok.Data;\r\n\n");
@@ -159,7 +161,7 @@ public class CodeGenerator {
         sb.append("\r\n@Entity");
         sb.append("\r\n@Table(name = \"" + tableName + "\")");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(StringUtils.isNotBlank(modelname) ? modelname : tableName) + " implements Serializable {\r\n\r\n");
-        processAllAttrs(sb, colnames, colTypes, colKeys, extras);// 属性
+        processAllAttrs(sb, colnames, colTypes, colKeys, extras,colComments);// 属性
         //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
@@ -167,9 +169,12 @@ public class CodeGenerator {
         return sb.toString();
     }
 
-    private static String buildVo(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, boolean f_util) {
+    private static String buildVo(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, boolean f_util,String[] colComments) {
         StringBuffer sb = new StringBuffer();
         sb.append("package ${businesspackage}.vo;\r\n\r\n");
+        if(ENABLED_SWAGGER) {
+            sb.append("import io.swagger.annotations.ApiModelProperty;\r\n");
+        }
         sb.append("import lombok.Data;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         // 判断是否导入工具包
@@ -186,7 +191,7 @@ public class CodeGenerator {
         // 实体部分
         sb.append("\r\n@Data");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(tableName) + "Vo implements Serializable {\r\n\r\n");
-        processAllAttrs2(sb, colnames, colTypes, colKeys, extras);// 属性
+        processAllAttrs2(sb, colnames, colTypes,colComments);// 属性
         //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
@@ -194,16 +199,19 @@ public class CodeGenerator {
         return sb.toString();
     }
 
-    private static void processAllAttrs2(StringBuffer sb, String[] colnames, String[] colTypes, String[] colKeys, String[] extras) {
+    private static void processAllAttrs2(StringBuffer sb, String[] colnames, String[] colTypes,String[] colComments) {
 
         for (int i = 0; i < colnames.length; i++) {
             String javaType = sqlType2JavaType(colTypes[i]);
+            if(ENABLED_SWAGGER&&StringUtils.isNotBlank(colComments[i])){
+                sb.append("    @ApiModelProperty(value = \"" + colComments[i] + "\")\r\n");
+            }
             sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(colnames[i]) + ";\r\n\r\n");
         }
 
     }
 
-    private static void processAllAttrs(StringBuffer sb, String[] colnames, String[] colTypes, String[] colKeys, String[] extras) {
+    private static void processAllAttrs(StringBuffer sb, String[] colnames, String[] colTypes, String[] colKeys, String[] extras,String[] colComments) {
 
         for (int i = 0; i < colnames.length; i++) {
 
@@ -225,7 +233,11 @@ public class CodeGenerator {
             if (StringUtils.equalsIgnoreCase(javaType, "Date")) {
                 sb.append("    @Temporal(value = TemporalType.TIMESTAMP)\r\n");
             }
-            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(colnames[i]) + ";\r\n\r\n");
+            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(colnames[i]) + ";");
+            if (StringUtils.isNotBlank(colComments[i])){
+                sb.append("  // "+colComments[i]);
+            }
+            sb.append("\r\n\r\n");
         }
 
     }

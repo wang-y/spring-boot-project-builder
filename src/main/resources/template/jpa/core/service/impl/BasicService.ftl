@@ -92,7 +92,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
             e = entityClass.newInstance();
             BeanUtils.copyProperties(v, e, ignore);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e1) {
-            e1.printStackTrace();
+//            e1.printStackTrace();
         }
         return e;
     }
@@ -104,7 +104,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
             v = voClass.newInstance();
             BeanUtils.copyProperties(e, v, ignore);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e1) {
-            e1.printStackTrace();
+//            e1.printStackTrace();
         }
         return v;
     }

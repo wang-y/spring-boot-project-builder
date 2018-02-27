@@ -7,6 +7,7 @@ import ${corepackage}.repo.IBasicRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.*;
@@ -506,7 +508,14 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
         String hql = "select entity from " + information.getEntityName() + " entity where 1=1 ";
         Query query = createQuery(hql + whereHql, queryParams);
 
-        return (T) query.getSingleResult();
+        T t;
+        try {
+            t= (T) query.getSingleResult();
+        }catch (NoResultException | EmptyResultDataAccessException e){
+            t = null;
+        }
+
+        return t;
     }
 
 }

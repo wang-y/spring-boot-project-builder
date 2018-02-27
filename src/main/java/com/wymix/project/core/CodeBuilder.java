@@ -775,6 +775,8 @@ public final class CodeBuilder {
                     writer.write("    open-in-view: true\n");
                     writer.write("    hibernate: \n");
                     writer.write("      ddl-auto: none\n");
+                    writer.write("      naming: \n");
+                    writer.write("        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl\n");
                 }
             }
 

@@ -63,6 +63,11 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
+    public Collection<V> listAll() {
+        return getRepository().findAll().stream().map(e -> entityToVo(e)).collect(Collectors.toList());
+    }
+
+    @Override
     public SimplePage<V> page(HashMap<String, Object> params, LinkedHashMap<String, String> orderBy, int page, int size) {
         SimplePage<E> epage = getRepository().findByPage(params, orderBy, size, page);
         SimplePage<V> vpage = new SimplePage<>(epage.getPageInfo());

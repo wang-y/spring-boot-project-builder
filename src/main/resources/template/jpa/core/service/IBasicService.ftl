@@ -19,6 +19,8 @@ public interface IBasicService<VO extends Serializable, ENTITY extends Serializa
 
     Collection<VO> list(HashMap<String, Object> params);
 
+    Collection<VO> listAll();
+
     SimplePage<VO> page(HashMap<String, Object> params, LinkedHashMap<String, String> orderBy, int page, int size);
 
     VO findOne(ID id);

@@ -34,7 +34,7 @@ import java.util.List;
 @Configuration
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 
-    private final Logger logger = LoggerFactory.getLogger(WebMvcConfigurer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfigurer.class);
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -71,7 +71,7 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
                     } else {
                         message = e.getMessage();
                     }
-                    logger.error(message, e);
+                    LOGGER.error(message, e);
                 }
                 responseResult(response, result);
                 return new ModelAndView();
@@ -87,7 +87,7 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
         try {
             response.getWriter().write(JSON.toJSONString(result));
         } catch (IOException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         }
     }
 

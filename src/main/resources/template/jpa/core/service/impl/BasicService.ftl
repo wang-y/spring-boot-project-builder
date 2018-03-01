@@ -81,6 +81,11 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
+    public E searchOne(ID id) {
+        return getRepository().findOne(id);
+    }
+
+    @Override
     public V findOne(HashMap<String, Object> params) {
         return entityToVo(getRepository().findOne(params));
     }

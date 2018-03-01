@@ -25,6 +25,8 @@ public interface IBasicService<VO extends Serializable, ENTITY extends Serializa
 
     VO findOne(ID id);
 
+    ENTITY searchOne(ID id);
+
     VO findOne(HashMap<String, Object> params);
 
     void delBatchByID(Collection<ID> id);

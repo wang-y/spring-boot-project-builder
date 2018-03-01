@@ -29,7 +29,7 @@ public interface IBasicService<VO extends Serializable, ENTITY extends Serializa
 
     void delBatchByID(Collection<ID> id);
 
-    ENTITY voToEntity(VO vo, String... ignore) throws IllegalAccessException, InstantiationException;
+    ENTITY voToEntity(VO vo, String... ignore);
 
-    VO entityToVo(ENTITY entity, String... ignore) throws IllegalAccessException, InstantiationException;
+    VO entityToVo(ENTITY entity, String... ignore);
 }

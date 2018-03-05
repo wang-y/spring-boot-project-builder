@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -24,21 +25,23 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProcessor, BeanClassLoaderAware {
 
-    private ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
+    private @Nullable
+    ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
 
     @Override
     public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader == null ? ClassUtils.getDefaultClassLoader() : classLoader;
+        this.classLoader = classLoader;
     }
 
     @Override
     public void postProcess(ProxyFactory factory, RepositoryInformation repositoryInformation) {
-        factory.addAdvice(${corepackage}.repo.factory.CrudMethodMetadataPostProcessor.CrudMethodMetadataPopulatingMethodInterceptor.INSTANCE);
+        factory.addAdvice(CrudMethodMetadataPopulatingMethodInterceptor.INSTANCE);
     }
 
     public CrudMethodMetadata getCrudMethodMetadata() {
@@ -46,12 +49,12 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
         ProxyFactory factory = new ProxyFactory();
 
         factory.addInterface(CrudMethodMetadata.class);
-        factory.setTargetSource(new ${corepackage}.repo.factory.CrudMethodMetadataPostProcessor.ThreadBoundTargetSource());
+        factory.setTargetSource(new ThreadBoundTargetSource());
 
         return (CrudMethodMetadata) factory.getProxy(this.classLoader);
     }
 
-    static enum CrudMethodMetadataPopulatingMethodInterceptor implements MethodInterceptor {
+    enum CrudMethodMetadataPopulatingMethodInterceptor implements MethodInterceptor {
 
         INSTANCE;
 
@@ -70,7 +73,7 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
 
             if (methodMetadata == null) {
 
-                methodMetadata = new ${corepackage}.repo.factory.CrudMethodMetadataPostProcessor.DefaultCrudMethodMetadata(method);
+                methodMetadata = new DefaultCrudMethodMetadata(method);
                 CrudMethodMetadata tmp = metadataCache.putIfAbsent(method, methodMetadata);
 
                 if (tmp != null) {
@@ -90,12 +93,12 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
 
     private static class DefaultCrudMethodMetadata implements CrudMethodMetadata {
 
-        private final LockModeType lockModeType;
+        private final @Nullable LockModeType lockModeType;
         private final Map<String, Object> queryHints;
-        private final EntityGraph entityGraph;
+        private final Optional<EntityGraph> entityGraph;
         private final Method method;
 
-        public DefaultCrudMethodMetadata(Method method) {
+        DefaultCrudMethodMetadata(Method method) {
 
             Assert.notNull(method, "Method must not be null!");
 
@@ -105,10 +108,11 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
             this.method = method;
         }
 
-        private static EntityGraph findEntityGraph(Method method) {
-            return AnnotatedElementUtils.findMergedAnnotation(method, EntityGraph.class);
+        private static Optional<EntityGraph> findEntityGraph(Method method) {
+            return Optional.ofNullable(AnnotatedElementUtils.findMergedAnnotation(method, EntityGraph.class));
         }
 
+        @Nullable
         private static LockModeType findLockModeType(Method method) {
 
             Lock annotation = AnnotatedElementUtils.findMergedAnnotation(method, Lock.class);
@@ -136,6 +140,7 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
             return Collections.unmodifiableMap(queryHints);
         }
 
+        @Nullable
         @Override
         public LockModeType getLockModeType() {
             return lockModeType;
@@ -147,7 +152,7 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
         }
 
         @Override
-        public EntityGraph getEntityGraph() {
+        public Optional<EntityGraph> getEntityGraph() {
             return entityGraph;
         }
 
@@ -177,7 +182,7 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
         }
 
         @Override
-        public void releaseTarget(Object target) throws Exception {
-        }
+        public void releaseTarget(Object target) throws Exception {}
     }
 }
+

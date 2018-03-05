@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -40,7 +42,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
 
     @Override
     public void delByID(ID id) {
-        getRepository().delete(id);
+        getRepository().deleteById(id);
     }
 
     @Override
@@ -77,12 +79,12 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
 
     @Override
     public V findOne(ID id) {
-        return entityToVo(getRepository().findOne(id));
+        return entityToVo(getRepository().findById(id).orElseGet(null));
     }
 
     @Override
     public E searchOne(ID id) {
-        return getRepository().findOne(id);
+        return getRepository().findById(id).orElseGet(null);
     }
 
     @Override

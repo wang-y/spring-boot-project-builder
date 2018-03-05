@@ -5,13 +5,13 @@ import ${corepackage}.page.SimplePage;
 import ${corepackage}.utils.ReflectUtil;
 import ${corepackage}.repo.IBasicRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
+import org.springframework.data.jpa.repository.support.QuerydslJpaRepository;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -20,7 +20,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.*;
 
-public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepository<T, ID>
+public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepository<T, ID>
         implements IBasicRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> information;
@@ -62,7 +62,7 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
     @Override
     public void delete(Collection<ID> ids) {
         for (ID id : ids) {
-            this.delete(id);
+            this.deleteById(id);
         }
 
     }
@@ -188,7 +188,7 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
         query = em.createNativeQuery(sql);
         setQueryParams(query, queryParams);
         query.setFirstResult(pageInfo.getStartRecord()).setMaxResults(pageInfo.getPageSize());
-        query.unwrap(SQLQuery.class).addEntity(this.getDomainClass());
+        query.unwrap(NativeQuery.class).addEntity(this.getDomainClass());
 
         return new SimplePage<T>(pageInfo, (List<T>) query.getResultList());
     }
@@ -465,7 +465,7 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
             }
         }
 
-        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        query.unwrap(NativeQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 
         return query.getResultList();
     }
@@ -481,7 +481,7 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
             query.setParameter(i++, obj);
         }
 
-        query.unwrap(SQLQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        query.unwrap(NativeQuery.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
         if (query.getResultList().size() == 0) {
             return null;
         } else {

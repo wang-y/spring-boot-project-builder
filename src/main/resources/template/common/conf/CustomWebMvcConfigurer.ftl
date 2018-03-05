@@ -22,7 +22,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 </#if>
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 @Configuration
-public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
+public class CustomWebMvcConfigurer implements WebMvcConfigurer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfigurer.class);
 

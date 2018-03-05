@@ -6,19 +6,18 @@ import org.springframework.data.jpa.provider.QueryExtractor;
 import org.springframework.data.jpa.repository.query.JpaQueryLookupStrategy;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
-import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
-
-import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
+import java.util.Optional;
 
 public class JpaRepositoryFactory extends RepositoryFactorySupport {
 
@@ -44,6 +43,11 @@ public class JpaRepositoryFactory extends RepositoryFactorySupport {
     }
 
     @Override
+    public <T, ID> EntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
+        return (JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager);
+    }
+
+    @Override
     protected Object getTargetRepository(RepositoryInformation information) {
 
         BasicRepository<?, ?> repository = getTargetRepository(information, entityManager);
@@ -55,7 +59,7 @@ public class JpaRepositoryFactory extends RepositoryFactorySupport {
     protected <T, ID extends Serializable> BasicRepository<T, ID> getTargetRepository(
             RepositoryInformation information, EntityManager entityManager) {
 
-        JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
+        EntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
 
         return getTargetRepositoryViaReflection(information, entityInformation, entityManager);
     }
@@ -66,13 +70,9 @@ public class JpaRepositoryFactory extends RepositoryFactorySupport {
     }
 
     @Override
-    protected QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key, EvaluationContextProvider evaluationContextProvider) {
-        return JpaQueryLookupStrategy.create(entityManager, key, extractor, evaluationContextProvider);
+    protected Optional<QueryLookupStrategy> getQueryLookupStrategy(@Nullable QueryLookupStrategy.Key key,
+                                                                   EvaluationContextProvider evaluationContextProvider) {
+        return Optional.of(JpaQueryLookupStrategy.create(entityManager, key, extractor, evaluationContextProvider));
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T, ID extends Serializable> JpaEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
-        return (JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager);
-    }
 }

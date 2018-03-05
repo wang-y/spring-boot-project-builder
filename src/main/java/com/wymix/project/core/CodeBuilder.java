@@ -304,11 +304,11 @@ public final class CodeBuilder {
             data.put("confpackage", PACKAGE_CONF);
             data.put("corepackage", PACKAGE_CORE);
             data.put("enabledSwagger",projectConfig.enable_swagger);
-            File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "WebMvcConfigurer.java");
+            File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "CustomWebMvcConfigurer.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/conf/WebMvcConfigurer.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/conf/CustomWebMvcConfigurer.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("通用配置类生成失败！");
             e.printStackTrace();
@@ -451,7 +451,7 @@ public final class CodeBuilder {
             writer.write("    <parent>\n");
             writer.write("        <groupId>org.springframework.boot</groupId>\n");
             writer.write("        <artifactId>spring-boot-starter-parent</artifactId>\n");
-            writer.write("        <version>1.5.10.RELEASE</version>\n");
+            writer.write("        <version>2.0.0.RELEASE</version>\n");
             writer.write("    </parent>\n\n");
 
             writer.write("    <groupId>com." + this.projectConfig.company + "</groupId>\n");
@@ -572,7 +572,7 @@ public final class CodeBuilder {
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
                         writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.6</version>\n");
+                        writer.write("            <version>1.1.8</version>\n");
                         writer.write("        </dependency>\n");
                         break;
                     case C3P0:
@@ -583,7 +583,7 @@ public final class CodeBuilder {
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
                         writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.6</version>\n");
+                        writer.write("            <version>1.1.8</version>\n");
                         writer.write("        </dependency>\n");
                         break;
                 }
@@ -724,7 +724,8 @@ public final class CodeBuilder {
             writer = new PrintWriter(outputStream);
             writer.write("server: \n");
             writer.write("  port: " + projectConfig.port + "\n");
-            writer.write("  context-path: /" + projectConfig.project + "\n\n");
+            writer.write("  servlet: \n");
+            writer.write("    context-path: /" + projectConfig.project + "\n\n");
 
             writer.write("spring: \n");
             writer.write("  application: \n");

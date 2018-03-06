@@ -214,7 +214,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                             query.setParameter(str, '%' + queryParams.get(key).toString() + '%');
                         }
                     } else if (str.endsWith("_in") || str.endsWith("_notin")) {
-                        Object t = null;
+                        Object t;
                         if (valueMap != null) {
                             t = valueMap.get(str);
                         } else {
@@ -224,28 +224,52 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         if (t instanceof List) {
                             List<Object> list = (List<Object>) t;
                             for (Object object : list) {
-                                query.setParameter(str + list.indexOf(object), object);
+                                query.setParameter(str + list.indexOf(object), mapToClazz(object,clazz));
                             }
                         } else if (t.getClass().isArray()) {
                             Object[] array = (Object[]) t;
                             for (int i = 0; i < array.length; i++) {
-                                query.setParameter(str + i, array[i]);
+                                query.setParameter(str + i, mapToClazz(array[i],clazz));
                             }
                         } else {
-                            query.setParameter(str, queryParams.get(key));
+                            query.setParameter(str, mapToClazz(queryParams.get(key),clazz));
                         }
                     } else {
                         if (StringUtils.endsWithAny(str, "_null", "_notnull")) {
                             continue;
                         }
                         if (valueMap != null) {
-                            query.setParameter(str, queryParams.get(str));
+                            query.setParameter(str, mapToClazz(queryParams.get(str),clazz));
                         }
-                        query.setParameter(str, queryParams.get(key));
+                        query.setParameter(str, mapToClazz(queryParams.get(key),clazz));
                     }
                 }
             }
         }
+    }
+
+    private static Object mapToClazz(Object obj, Class<?> clazz) {
+        Object result = null;
+        if (clazz.equals(String.class)) {
+            result = obj.toString();
+        } else if (clazz.equals(Integer.class)) {
+            result = Integer.parseInt(obj.toString());
+        } else if (clazz.equals(Float.class)) {
+            result = Float.parseFloat(obj.toString());
+        } else if (clazz.equals(Double.class)) {
+            result = Double.parseDouble(obj.toString());
+        } else if (clazz.equals(Short.class)) {
+            result = Short.parseShort(obj.toString());
+        } else if (clazz.equals(Byte.class)) {
+            result = Byte.parseByte(obj.toString());
+        } else if (clazz.equals(Boolean.class)) {
+            result = Boolean.parseBoolean(obj.toString());
+        } else if (clazz.equals(Character.class)) {
+            result = obj.toString();
+        }else if (clazz.equals(Long.class)) {
+            result = Long.parseLong(obj.toString());
+        }
+        return result;
     }
 
     private String buildOrderby(LinkedHashMap<String, String> orderby) {

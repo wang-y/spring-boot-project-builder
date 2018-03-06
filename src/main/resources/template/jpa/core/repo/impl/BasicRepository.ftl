@@ -247,6 +247,30 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
             }
         }
     }
+    
+    private static Object mapToClazz(Object obj, Class<?> clazz) {
+        Object result = null;
+        if (clazz.equals(String.class)) {
+            result = obj.toString();
+        } else if (clazz.equals(Integer.class)) {
+            result = Integer.parseInt(obj.toString());
+        } else if (clazz.equals(Float.class)) {
+            result = Float.parseFloat(obj.toString());
+        } else if (clazz.equals(Double.class)) {
+            result = Double.parseDouble(obj.toString());
+        } else if (clazz.equals(Short.class)) {
+            result = Short.parseShort(obj.toString());
+        } else if (clazz.equals(Byte.class)) {
+            result = Byte.parseByte(obj.toString());
+        } else if (clazz.equals(Boolean.class)) {
+            result = Boolean.parseBoolean(obj.toString());
+        } else if (clazz.equals(Character.class)) {
+            result = obj.toString();
+        }else if (clazz.equals(Long.class)) {
+            result = Long.parseLong(obj.toString());
+        }
+        return result;
+    }
 
     private static Object mapToClazz(Object obj, Class<?> clazz) {
         Object result = null;

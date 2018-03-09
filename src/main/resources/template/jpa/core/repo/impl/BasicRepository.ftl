@@ -250,7 +250,8 @@ public class BasicRepository<T, ID extends Serializable> extends QueryDslJpaRepo
     
     private static Object mapToClazz(Object obj, Class<?> clazz) {
         Object result = null;
-        if (clazz.equals(String.class)) {
+        if(obj == null){
+        } else if (clazz.equals(String.class)) {
             result = obj.toString();
         } else if (clazz.equals(Integer.class)) {
             result = Integer.parseInt(obj.toString());

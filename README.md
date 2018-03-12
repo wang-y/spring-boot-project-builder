@@ -10,7 +10,7 @@ public class Main {
                 .enableSwagger()  //启用swagger
                 .setDataBaseType(DataBaseType.MYSQL)  //指定数据库类型（目前仅支持mysql）
                 .configure("jdbc:mysql://192.168.1.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930") //配置数据库
-                .setOrmType(OrmType.JPA) //指定持久层框架(目前仅JPA)
+                .setOrmType(OrmType.JPA) //指定持久层框架(目前仅JPA/MyBatis)
                 .setDataBaseConnectPool(DataBaseConnectPool.DRUID);//指定数据库连接池(目前仅支持DRUID)
 
         //向"/home/wymix/workspaces/study_diary_workspaces/"输出项目文件

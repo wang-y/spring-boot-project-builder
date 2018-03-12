@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSON;
  * 统一API响应结果封装
  */
 public class Result<T> {
-    private int code=200;
+    private int code;
     private String message;
     private T data;
 

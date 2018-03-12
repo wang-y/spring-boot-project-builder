@@ -106,7 +106,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
             BeanUtils.copyProperties(v, e, ignore);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e1) {
 //            e1.printStackTrace();
-            throw new ServiceException(e.getMessage(), e);
+            throw new ServiceException(e1.getMessage(), e1);
         }
         return e;
     }
@@ -119,7 +119,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
             BeanUtils.copyProperties(e, v, ignore);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException e1) {
 //            e1.printStackTrace();
-            throw new ServiceException(e.getMessage(), e);
+            throw new ServiceException(e1.getMessage(), e1);
         }
         return v;
     }

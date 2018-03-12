@@ -58,6 +58,8 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                     result.setCode(ResultCode.NOT_FOUND).setMessage("接口 [" + request.getRequestURI() + "] 不存在");
                 } else if (e instanceof ServletException) {
                     result.setCode(ResultCode.FAIL).setMessage(e.getMessage());
+                } else if (e instanceof ServletException) {
+                    result.setCode(ResultCode.FAIL).setMessage(e.getMessage());
                 } else {
                     result.setCode(ResultCode.INTERNAL_SERVER_ERROR).setMessage("接口 [" + request.getRequestURI() + "] 内部错误，请联系管理员");
                     String message;

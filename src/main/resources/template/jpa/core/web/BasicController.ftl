@@ -3,6 +3,7 @@ package ${corepackage}.web;
 import ${corepackage}.common.PageRequest;
 import ${corepackage}.common.PostRequest;
 import ${corepackage}.common.Result;
+import ${corepackage}.common.ResultGenerator;
 import ${corepackage}.page.SimplePage;
 import ${corepackage}.service.IBasicService;
 <#if enabledSwagger>
@@ -24,7 +25,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     </#if>
     @GetMapping(value = "getOne")
     public Result<V> getOne(<#if enabledSwagger>@ApiParam(required = true, value = "主键") </#if>@RequestParam(required = true) ID id) {
-        return new Result<>(getService().findOne(id));
+        return ResultGenerator.genSuccessResult(getService().findOne(id));
     }
 
     <#if enabledSwagger>
@@ -33,25 +34,25 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     </#if>
     @PostMapping(value = "findOne")
     public Result<V> findOne(@RequestBody PostRequest request) {
-        return new Result<>(getService().findOne(request.getQueryParams()));
+        return ResultGenerator.genSuccessResult(getService().findOne(request.getQueryParams()));
     }
 
     <#if enabledSwagger>
-    @ApiOperation(value = "列表", notes = "根据查询分页列表")
+    @ApiOperation(value = "列表", notes = "根据条件查询分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PageRequest", paramType = "body")
     </#if>
     @PostMapping(value = "page")
     public Result<SimplePage<V>> page(@RequestBody PageRequest request) {
-        return new Result<>(getService().page(request.getQueryParams(), request.getOrderBy(), request.getPage(), request.getSize()));
+        return ResultGenerator.genSuccessResult(getService().page(request.getQueryParams(), request.getOrderBy(), request.getPage(), request.getSize()));
     }
 
     <#if enabledSwagger>
-    @ApiOperation(value = "列表", notes = "根据查询未分页列表")
+    @ApiOperation(value = "列表", notes = "根据条件查询不分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
     </#if>
     @PostMapping(value = "list")
     public Result<Collection<V>> list(@RequestBody PostRequest request) {
-        return new Result<>(getService().list(request.getQueryParams(), request.getOrderBy()));
+        return ResultGenerator.genSuccessResult(getService().list(request.getQueryParams(), request.getOrderBy()));
     }
 
     <#if enabledSwagger>
@@ -59,7 +60,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     </#if>
     @PostMapping(value = "add")
     public Result<V> add(@RequestBody V v) {
-        return new Result<>(getService().save(v));
+        return ResultGenerator.genSuccessResult(getService().save(v));
     }
 
     <#if enabledSwagger>
@@ -67,7 +68,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     </#if>
     @PostMapping(value = "modify")
     public Result<V> modify(@RequestBody V v) {
-        return new Result<>(getService().update(v));
+        return ResultGenerator.genSuccessResult(getService().update(v));
     }
 
     <#if enabledSwagger>
@@ -76,7 +77,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     @GetMapping(value = "delOne")
     public Result<Void> delOne(<#if enabledSwagger>@ApiParam(required = true, value = "主键") </#if>@RequestParam ID id) {
         getService().delByID(id);
-        return new Result<>();
+        return ResultGenerator.genSuccessResult();
     }
 
     <#if enabledSwagger>
@@ -85,7 +86,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     @GetMapping(value = "del")
     public Result<Void> del(<#if enabledSwagger>@ApiParam(required = true, value = "主键集合") </#if>@RequestParam Collection<ID> ids) {
         getService().delBatchByID(ids);
-        return new Result<>();
+        return ResultGenerator.genSuccessResult();
     }
 
 }

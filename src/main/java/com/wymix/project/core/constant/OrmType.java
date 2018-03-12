@@ -1,5 +1,5 @@
 package com.wymix.project.core.constant;
 
 public enum OrmType {
-    NONE, JPA//, MYBATIS
+    NONE, JPA, MYBATIS
 }

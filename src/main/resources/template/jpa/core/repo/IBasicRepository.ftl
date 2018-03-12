@@ -13,42 +13,42 @@ import java.util.*;
 public interface IBasicRepository<T, ID extends Serializable>
         extends JpaRepository<T, ID>, JpaSpecificationExecutor<T>, QuerydslPredicateExecutor<T> {
 
-    public void delete(Collection<ID> ids);
+    void delete(Collection<ID> ids);
 
-    public List<T> findAll(HashMap<String, Object> queryParams, LinkedHashMap<String, String> orderby);
+    List<T> findAll(HashMap<String, Object> queryParams, LinkedHashMap<String, String> orderby);
 
-    public SimplePage<T> findByPage(HashMap<String, Object> queryParams, LinkedHashMap<String, String> orderby,
+    SimplePage<T> findByPage(HashMap<String, Object> queryParams, LinkedHashMap<String, String> orderby,
                                     Integer pageSize, Integer pageNum);
 
-    public SimplePage<T> findByPageWithSql(String sql, HashMap<String, Object> queryParams, Integer pageSize,
+    SimplePage<T> findByPageWithSql(String sql, HashMap<String, Object> queryParams, Integer pageSize,
                                            Integer pageNum);
 
-    public SimplePage<T> findByPageWithHql(String hql, HashMap<String, Object> queryParams, Integer pageSize,
+    SimplePage<T> findByPageWithHql(String hql, HashMap<String, Object> queryParams, Integer pageSize,
                                            Integer pageNum);
 
-    public SimplePage<T> findByPageWithWhereHql(String whereHql, HashMap<String, Object> queryParams, Integer pageSize,
+    SimplePage<T> findByPageWithWhereHql(String whereHql, HashMap<String, Object> queryParams, Integer pageSize,
                                                 Integer pageNum);
 
-    public SimplePage<T> findByPage(HashMap<String, Object> queryParams, String orderby, Integer pageSize,
+    SimplePage<T> findByPage(HashMap<String, Object> queryParams, String orderby, Integer pageSize,
                                     Integer pageNum);
 
-    public List<T> findAllBySql(Class<T> entityClass, String sql);
+    List<T> findAllBySql(Class<T> entityClass, String sql);
 
-    public String getUniqueResultBySql(String sql, HashMap<String, Object> queryParams);
+    String getUniqueResultBySql(String sql, HashMap<String, Object> queryParams);
 
-    public SimplePage<T> findByPage(HashMap<String, Object> queryParams, Integer pageSize, Integer pageNum);
+    SimplePage<T> findByPage(HashMap<String, Object> queryParams, Integer pageSize, Integer pageNum);
 
-    public boolean isPropertyUnique(String propertyName, Object newValue, Object oldValue);
+    boolean isPropertyUnique(String propertyName, Object newValue, Object oldValue);
 
-    public T findUniqueByProperty(String propertyName, Object value);
+    T findUniqueByProperty(String propertyName, Object value);
 
-    public List<Map<String, Object>> dosql(String sql, Object... value);
+    List<Map<String, Object>> dosql(String sql, Object... value);
 
-    public Map<String, Object> execsql(String sql, Object... value);
+    Map<String, Object> execsql(String sql, Object... value);
 
-    public int ddl(String sql, Object... value);
+    int ddl(String sql, Object... value);
 
-    public T findOne(HashMap<String, Object> queryParams);
+    T findOne(HashMap<String, Object> queryParams);
 
 }
 

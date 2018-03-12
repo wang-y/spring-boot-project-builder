@@ -91,7 +91,7 @@ public final class CodeBuilder {
 
         PACKAGE_CONF = basepackage + ".conf";
         PACKAGE_CORE = basepackage + ".core";
-        PACKAGE_BUSINESS=basepackage+ ".business";
+        PACKAGE_BUSINESS = basepackage + ".business";
         BASE_PACKAGE = basepackage;
 
         PACKAGE_PATH_CONF = packageConvertPath(PACKAGE_CONF);
@@ -110,9 +110,10 @@ public final class CodeBuilder {
                 copyConfJPAJava();
                 genJPABusinessLogicCode();
                 break;
-//            case MYBATIS:
-//                copyCoreMYBATISJava();
-//                break;
+            case MYBATIS:
+                copyCoreMyBatisJava();
+                copyConfMyBatisJava();
+                break;
             default:
                 copyCoreJPAJava();
                 copyConfJPAJava();
@@ -121,28 +122,87 @@ public final class CodeBuilder {
         }
         copyCoreCommonJava();
         copyConfCommonJava();
-        if(projectConfig.enable_swagger){
+        if (projectConfig.enable_swagger) {
             copyConfSwaggerJava();
         }
-        ///
         copyCodeTemplate();
         copyBanner();
         System.out.println("项目创建完毕！");
     }
 
+    private void copyConfMyBatisJava() {
+        try {
+            freemarker.template.Configuration cfg = getConfiguration();
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("confpackage", PACKAGE_CONF);
+            data.put("corepackage", PACKAGE_CORE);
+
+            File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "MybatisConfigurer.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/conf/MybatisConfigurer.ftl").process(data, new FileWriter(file));
+        } catch (Exception e) {
+            System.out.println("MyBatis配置类生成失败！");
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.println("MyBatis配置类生成完毕！");
+    }
+
+    private void copyCoreMyBatisJava() {
+        try {
+            freemarker.template.Configuration cfg = getConfiguration();
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("corepackage", PACKAGE_CORE);
+
+            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/Mapper.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/mapper/Mapper.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/Service.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/service/Service.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/AbstractService.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/service/impl/AbstractService.ftl").process(data, new FileWriter(file));
+
+            data.put("basepackage", BASE_PACKAGE);
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "constant/ProjectConstant.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/constant/ProjectConstant.ftl").process(data, new FileWriter(file));
+        } catch (Exception e) {
+            System.out.println("MyBatis核心库生成失败！");
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.println("MyBatis核心库生成完毕！");
+    }
+
     private void copyBanner() {
         try {
-            File file = new File(getResourcePath()  + "banner.txt");
+            File file = new File(getResourcePath() + "banner.txt");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
             try {
-                Files.copy(new File(TEMPLATE_FILE_PATH+"/banner.txt").toPath(), file.toPath());
-            }catch (Exception e){
+                Files.copy(new File(TEMPLATE_FILE_PATH + "/banner.txt").toPath(), file.toPath());
+            } catch (Exception e) {
                 System.out.println("banner已存在！");
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("banner生成失败！");
             e.printStackTrace();
             System.exit(0);
@@ -155,58 +215,101 @@ public final class CodeBuilder {
             freemarker.template.Configuration cfg = getConfiguration();
 
             Map<String, Object> data = new HashMap<>();
-            data.put("businesspackage", PACKAGE_BUSINESS);
-            data.put("corepackage", PACKAGE_CORE);
 
-            data.put("modelName", "${modelName}");
-            data.put("PKType", "${PKType}");
+            if(projectConfig.dataBaseConfig.getOrmType()==OrmType.JPA) {
+                data.put("businesspackage", PACKAGE_BUSINESS);
+                data.put("corepackage", PACKAGE_CORE);
 
-            File file = new File(getTestResourcesPath()  + "generator/template/repository/TemplateRepository.ftl");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
+                data.put("modelName", "${modelName}");
+                data.put("PKType", "${PKType}");
+
+                File file = new File(getTestResourcesPath() + "generator/template/repository/TemplateRepository.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("jpa/business/repository/TemplateRepository.ftl").process(data, new FileWriter(file));
+
+                file = new File(getTestResourcesPath() + "generator/template/service/TemplateService.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("jpa/business/service/TemplateService.ftl").process(data, new FileWriter(file));
+
+                file = new File(getTestResourcesPath() + "generator/template/service/impl/TemplateServiceImpl.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("jpa/business/service/impl/TemplateServiceImpl.ftl").process(data, new FileWriter(file));
+
+                data.put("model", "${modelName?lower_case}");
+                file = new File(getTestResourcesPath() + "generator/template/web/TemplateController.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("jpa/business/web/TemplateController.ftl").process(data, new FileWriter(file));
+
+                String url = projectConfig.dataBaseConfig.getJdbc_url();
+                String cleanURI = url.substring(5);
+
+                URI uri = URI.create(cleanURI);
+
+                data = new HashMap<>();
+                data.put("basepackage", BASE_PACKAGE);
+                data.put("database_user", projectConfig.dataBaseConfig.getUser());
+                data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
+                data.put("host", uri.getHost());
+                data.put("port", String.valueOf(uri.getPort()));
+                data.put("database", uri.getPath().replaceFirst("/", ""));
+                data.put("businesspackage", PACKAGE_BUSINESS);
+                data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
+
+                file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("gen/JPA_CodeGenerator.ftl").process(data, new FileWriter(file));
+            }else if (projectConfig.dataBaseConfig.getOrmType()==OrmType.MYBATIS){
+                data.put("basePackage", BASE_PACKAGE);
+                data.put("modelNameUpperCamel", "${modelNameUpperCamel}");
+                data.put("modelNameLowerCamel", "${modelNameLowerCamel}");
+                data.put("enabledSwagger",projectConfig.enable_swagger);
+                data.put("baseRequestMapping","${baseRequestMapping}");
+
+                File file = new File(getTestResourcesPath() + "generator/template/service/service.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("mybatis/business/service/service.ftl").process(data, new FileWriter(file));
+
+                file = new File(getTestResourcesPath() + "generator/template/service/impl/service-impl.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("mybatis/business/service/service-impl.ftl").process(data, new FileWriter(file));
+
+                file = new File(getTestResourcesPath() + "generator/template/web/controller.ftl");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("mybatis/business/web/controller.ftl").process(data, new FileWriter(file));
+
+                data = new HashMap<>();
+                data.put("basepackage", BASE_PACKAGE);
+                data.put("corepackage", PACKAGE_CORE);
+
+                data.put("database_url", projectConfig.dataBaseConfig.getJdbc_url());
+                data.put("database_user", projectConfig.dataBaseConfig.getUser());
+                data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
+
+                data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
+
+                file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("gen/MYBATIS_CodeGenerator.ftl").process(data, new FileWriter(file));
             }
-            cfg.getTemplate("jpa/business/repository/TemplateRepository.ftl").process(data, new FileWriter(file));
-
-            file = new File(getTestResourcesPath()  + "generator/template/service/TemplateService.ftl");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/business/service/TemplateService.ftl").process(data, new FileWriter(file));
-
-            file = new File(getTestResourcesPath()  + "generator/template/service/impl/TemplateServiceImpl.ftl");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/business/service/impl/TemplateServiceImpl.ftl").process(data, new FileWriter(file));
-
-            data.put("model", "${modelName?lower_case}");
-            file = new File(getTestResourcesPath()  + "generator/template/web/TemplateController.ftl");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/business/web/TemplateController.ftl").process(data, new FileWriter(file));
-
-            String url = projectConfig.dataBaseConfig.getJdbc_url();
-            String cleanURI = url.substring(5);
-
-            URI uri = URI.create(cleanURI);
-
-            data = new HashMap<>();
-            data.put("basepackage", BASE_PACKAGE);
-            data.put("database_user", projectConfig.dataBaseConfig.getUser());
-            data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
-            data.put("host", uri.getHost());
-            data.put("port", String.valueOf(uri.getPort()));
-            data.put("database", uri.getPath().replaceFirst("/",""));
-            data.put("businesspackage", PACKAGE_BUSINESS);
-            data.put("enabled_swagger", projectConfig.enable_swagger?"yes":"no");
-
-            file = new File(getTestJavaPath() +BASE_PACKAGE_PATH + "CodeGenerator.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("gen/CodeGenerator.ftl").process(data, new FileWriter(file));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("代码生成器类创建失败！");
             e.printStackTrace();
             System.exit(0);
@@ -227,7 +330,7 @@ public final class CodeBuilder {
                 file.getParentFile().mkdirs();
             }
             cfg.getTemplate("common/conf/SwaggerConf.ftl").process(data, new FileWriter(file));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("swagger配置类生成失败！");
             e.printStackTrace();
             System.exit(0);
@@ -289,6 +392,18 @@ public final class CodeBuilder {
                 file.getParentFile().mkdirs();
             }
             cfg.getTemplate("common/core/common/PageRequest.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/ServiceException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/ServiceException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/ResultGenerator.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/ResultGenerator.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();
@@ -303,7 +418,7 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
             data.put("confpackage", PACKAGE_CONF);
             data.put("corepackage", PACKAGE_CORE);
-            data.put("enabledSwagger",projectConfig.enable_swagger);
+            data.put("enabledSwagger", projectConfig.enable_swagger);
             File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "CustomWebMvcConfigurer.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -407,7 +522,7 @@ public final class CodeBuilder {
             //
             //
             //
-            data.put("enabledSwagger",projectConfig.enable_swagger);
+            data.put("enabledSwagger", projectConfig.enable_swagger);
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "web/BasicController.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -507,27 +622,27 @@ public final class CodeBuilder {
                         writer.write("            <artifactId>mysql-connector-java</artifactId>\n");
                         writer.write("        </dependency>\n");
                         break;
-                    case ORACLE:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-                        writer.write("            <version>12.2.0.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case DB2:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-                        writer.write("            <version>12.2.0.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case SQLSERVER:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-                        writer.write("            <version>12.2.0.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
+//                    case ORACLE:
+//                        writer.write("        <dependency>\n");
+//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
+//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
+//                        writer.write("            <version>12.2.0.1</version>\n");
+//                        writer.write("        </dependency>\n");
+//                        break;
+//                    case DB2:
+//                        writer.write("        <dependency>\n");
+//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
+//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
+//                        writer.write("            <version>12.2.0.1</version>\n");
+//                        writer.write("        </dependency>\n");
+//                        break;
+//                    case SQLSERVER:
+//                        writer.write("        <dependency>\n");
+//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
+//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
+//                        writer.write("            <version>12.2.0.1</version>\n");
+//                        writer.write("        </dependency>\n");
+//                        break;
                 }
 
                 switch (projectConfig.dataBaseConfig.getOrmType()) {
@@ -536,33 +651,61 @@ public final class CodeBuilder {
                         writer.write("            <groupId>org.springframework.boot</groupId>\n");
                         writer.write("            <artifactId>spring-boot-starter-data-jpa</artifactId>\n");
                         writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.querydsl</groupId>\n");
+                        writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.querydsl</groupId>\n");
+                        writer.write("            <artifactId>querydsl-apt</artifactId>\n");
+                        writer.write("            <scope>provided</scope>\n");
+                        writer.write("        </dependency>\n");
                         break;
-//                    case MYBATIS:
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>org.mybatis</groupId>\n");
-//                        writer.write("            <artifactId>mybatis-spring</artifactId>\n");
-//                        writer.write("            <version>1.3.1</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>org.mybatis</groupId>\n");
-//                        writer.write("            <artifactId>mybatis</artifactId>\n");
-//                        writer.write("            <version>3.4.5</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>tk.mybatis</groupId>\n");
-//                        writer.write("            <artifactId>mapper</artifactId>\n");
-//                        writer.write("            <version>3.4.2</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>com.github.pagehelper</groupId>\n");
-//                        writer.write("            <artifactId>pagehelper</artifactId>\n");
-//                        writer.write("            <version>4.2.1</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        break;
+                    case MYBATIS:
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>org.springframework.boot</groupId>\n");
+                        writer.write("            <artifactId>spring-boot-starter-jdbc</artifactId>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>org.mybatis</groupId>\n");
+                        writer.write("            <artifactId>mybatis-spring</artifactId>\n");
+                        writer.write("            <version>1.3.1</version>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>org.mybatis</groupId>\n");
+                        writer.write("            <artifactId>mybatis</artifactId>\n");
+                        writer.write("            <version>3.4.5</version>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>tk.mybatis</groupId>\n");
+                        writer.write("            <artifactId>mapper</artifactId>\n");
+                        writer.write("            <version>3.4.2</version>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.github.pagehelper</groupId>\n");
+                        writer.write("            <artifactId>pagehelper</artifactId>\n");
+                        writer.write("            <version>4.2.1</version>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>org.mybatis.generator</groupId>\n");
+                        writer.write("            <artifactId>mybatis-generator-core</artifactId>\n");
+                        writer.write("            <version>1.3.5</version>\n");
+                        writer.write("            <scope>test</scope>\n");
+                        writer.write("        </dependency>\n");
+                        break;
                     default:
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>org.springframework.boot</groupId>\n");
                         writer.write("            <artifactId>spring-boot-starter-data-jpa</artifactId>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.querydsl</groupId>\n");
+                        writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
+                        writer.write("        </dependency>\n");
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.querydsl</groupId>\n");
+                        writer.write("            <artifactId>querydsl-apt</artifactId>\n");
+                        writer.write("            <scope>provided</scope>\n");
                         writer.write("        </dependency>\n");
                         break;
                 }
@@ -575,10 +718,10 @@ public final class CodeBuilder {
                         writer.write("            <version>1.1.8</version>\n");
                         writer.write("        </dependency>\n");
                         break;
-                    case C3P0:
-                        break;
-                    case HIKARICP:
-                        break;
+//                    case C3P0:
+//                        break;
+//                    case HIKARICP:
+//                        break;
                     default:
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
@@ -592,7 +735,7 @@ public final class CodeBuilder {
             writer.write("        <dependency>\n");
             writer.write("            <groupId>com.alibaba</groupId>\n");
             writer.write("            <artifactId>fastjson</artifactId>\n");
-            writer.write("            <version>1.2.44</version>\n");
+            writer.write("            <version>1.2.46</version>\n");
             writer.write("        </dependency>\n");
 
             writer.write("        <dependency>\n");
@@ -624,17 +767,6 @@ public final class CodeBuilder {
             writer.write("            <groupId>com.google.guava</groupId>\n");
             writer.write("            <artifactId>guava</artifactId>\n");
             writer.write("            <version>24.0-jre</version>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>com.querydsl</groupId>\n");
-            writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>com.querydsl</groupId>\n");
-            writer.write("            <artifactId>querydsl-apt</artifactId>\n");
-            writer.write("            <scope>provided</scope>\n");
             writer.write("        </dependency>\n");
 
             writer.write("    </dependencies>\n\n");
@@ -743,30 +875,30 @@ public final class CodeBuilder {
                     case MYSQL:
                         writer.write("    driver-class-name: com.mysql.jdbc.Driver\n");
                         break;
-                    case ORACLE:
-                        writer.write("    driver-class-name: oracle.jdbc.OracleDriver\n");
-                        break;
-                    case DB2:
-                        writer.write("    driver-class-name: \n");
-                        break;
-                    case SQLSERVER:
-                        writer.write("    driver-class-name: \n");
-                        break;
+//                    case ORACLE:
+//                        writer.write("    driver-class-name: oracle.jdbc.OracleDriver\n");
+//                        break;
+//                    case DB2:
+//                        writer.write("    driver-class-name: \n");
+//                        break;
+//                    case SQLSERVER:
+//                        writer.write("    driver-class-name: \n");
+//                        break;
 
                 }
                 switch (projectConfig.dataBaseConfig.getDataBaseConnectPool()) {
                     case DRUID:
                         writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
                         break;
-                    case C3P0:
-                        writer.write("    type: oracle.jdbc.OracleDriver\n");
-                        break;
-                    case HIKARICP:
-                        writer.write("    type: \n");
-                        break;
-                    default:
-                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
-                        break;
+//                    case C3P0:
+//                        writer.write("    type: oracle.jdbc.OracleDriver\n");
+//                        break;
+//                    case HIKARICP:
+//                        writer.write("    type: \n");
+//                        break;
+//                    default:
+//                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
+//                        break;
 
                 }
 

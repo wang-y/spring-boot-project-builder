@@ -22,6 +22,9 @@ public class Main {
 
 一键生成 spring boot 项目代码
 
+
+# 使用JPA
+
 在生成的代码中
 
 src/test/java/com/company/project/CodeGenerator
@@ -34,3 +37,16 @@ public static void main(String[] args) {
 ```
 
 因该项目引入了QueryDSL，所以在生成代码后 执行 _mvn clean compile_  生成Q结构查询实体
+
+# 使用MyBatis
+
+在生成的代码中
+
+src/test/java/com/company/project/CodeGenerator
+
+```java
+public static void main(String[] args) {
+        genCode("test_table");  //生成对应表的model/repository/service/web代码
+//        genCodeByCustomModelName("输入表名","输入自定义Model名称");  
+    }
+```

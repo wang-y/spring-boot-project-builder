@@ -715,7 +715,7 @@ public final class CodeBuilder {
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
                         writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.8</version>\n");
+                        writer.write("            <version>1.1.9</version>\n");
                         writer.write("        </dependency>\n");
                         break;
 //                    case C3P0:
@@ -726,7 +726,7 @@ public final class CodeBuilder {
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
                         writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.8</version>\n");
+                        writer.write("            <version>1.1.9</version>\n");
                         writer.write("        </dependency>\n");
                         break;
                 }

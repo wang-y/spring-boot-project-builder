@@ -1,5 +1,6 @@
 # spring-boot-project-builder
-Spring Boot项目快速构建
+
+快速构建Spring Boot项目
 
 ```java
 public class Main {

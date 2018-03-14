@@ -7,6 +7,7 @@ import ${corepackage}.repo.IBasicRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
@@ -18,10 +19,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.*;
 
 public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepository<T, ID>
         implements IBasicRepository<T, ID> {
+
+    private final static String TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private final static String DATE_FORMAT = "yyyy-MM-dd";
 
     private final JpaEntityInformation<T, ?> information;
     private final EntityManager em;
@@ -269,6 +274,19 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
             result = obj.toString();
         }else if (clazz.equals(Long.class)) {
             result = Long.parseLong(obj.toString());
+        } else if (clazz.equals(Date.class)) {
+            String str = obj.toString();
+            if (str.length() >= 19) {
+                result = DateTimeFormat.forPattern(TIME_FORMAT).parseDateTime(str).toDate();
+            } else if (str.length() >= 10) {
+                result = DateTimeFormat.forPattern(DATE_FORMAT).parseDateTime(str).toDate();
+            }
+        } else if (clazz.equals(Timestamp.class)) {
+            String str = obj.toString();
+            result = Timestamp.valueOf(str);
+        }else if (clazz.equals(java.sql.Date.class)) {
+            String str = obj.toString();
+            result = java.sql.Date.valueOf(str);
         }
         return result;
     }

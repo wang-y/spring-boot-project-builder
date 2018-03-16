@@ -23,7 +23,7 @@ public class CodeGenerator {
     private static final String JDBC_URL = "${database_url}";
     private static final String JDBC_USERNAME = "${database_user}";
     private static final String JDBC_PASSWORD = "${database_passowrd}";
-    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private static final String JDBC_DIVER_CLASS_NAME = "${jdbc_diver_class_name}";
 
     private static final String PROJECT_PATH = System.getProperty("user.dir");//项目在硬盘上的基础路径
     private static final String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/test/resources/generator/template";//模板位置
@@ -37,6 +37,8 @@ public class CodeGenerator {
 
     private static final String AUTHOR = "CodeGenerator";//@author
     private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
+
+    private static final String DATABASETYPE="${databasetype}";
 
     <#--private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";-->
 
@@ -106,8 +108,12 @@ public class CodeGenerator {
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
         tableConfiguration.setTableName(tableName);
-        if (StringUtils.isNotEmpty(modelName))tableConfiguration.setDomainObjectName(modelName);
-        tableConfiguration.setGeneratedKey(new GeneratedKey("id", "Mysql", true, null));
+        if (StringUtils.isNotEmpty(modelName))
+            tableConfiguration.setDomainObjectName(modelName);
+        if (StringUtils.equalsIgnoreCase(DATABASETYPE,"mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE,"sqlserver")){
+            tableConfiguration.setGeneratedKey(new GeneratedKey("id", DATABASETYPE, true, null));
+        }
+        tableConfiguration.setGeneratedKey(new GeneratedKey("id", DATABASETYPE, true, null));
         context.addTableConfiguration(tableConfiguration);
 
         List<String> warnings;

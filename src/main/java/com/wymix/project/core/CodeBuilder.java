@@ -5,7 +5,6 @@ import com.wymix.project.core.constant.OrmType;
 import freemarker.template.TemplateExceptionHandler;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -211,12 +210,27 @@ public final class CodeBuilder {
     }
 
     private void copyCodeTemplate() {
+        String jdbc_driver = "";
+        if(projectConfig.dataBaseConfig!=null&&projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE){
+            switch (projectConfig.dataBaseConfig.getDataBaseType()) {
+                case MYSQL:
+                    jdbc_driver += "com.mysql.jdbc.Driver";
+                    break;
+                case ORACLE:
+                    jdbc_driver += "oracle.jdbc.OracleDriver";
+                    break;
+                case SQLSERVER:
+                    jdbc_driver += "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+                    break;
+            }
+        }
+
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
             Map<String, Object> data = new HashMap<>();
 
-            if(projectConfig.dataBaseConfig.getOrmType()==OrmType.JPA) {
+            if (projectConfig.dataBaseConfig.getOrmType() == OrmType.JPA) {
                 data.put("businesspackage", PACKAGE_BUSINESS);
                 data.put("corepackage", PACKAGE_CORE);
 
@@ -248,32 +262,27 @@ public final class CodeBuilder {
                 }
                 cfg.getTemplate("jpa/business/web/TemplateController.ftl").process(data, new FileWriter(file));
 
-                String url = projectConfig.dataBaseConfig.getJdbc_url();
-                String cleanURI = url.substring(5);
-
-                URI uri = URI.create(cleanURI);
-
                 data = new HashMap<>();
                 data.put("basepackage", BASE_PACKAGE);
                 data.put("database_user", projectConfig.dataBaseConfig.getUser());
                 data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
-                data.put("host", uri.getHost());
-                data.put("port", String.valueOf(uri.getPort()));
-                data.put("database", uri.getPath().replaceFirst("/", ""));
+                data.put("database_url", projectConfig.dataBaseConfig.getJdbc_url());
                 data.put("businesspackage", PACKAGE_BUSINESS);
                 data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
+                data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
+                data.put("jdbc_diver_class_name",jdbc_driver);
 
                 file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
                 if (!file.getParentFile().exists()) {
                     file.getParentFile().mkdirs();
                 }
                 cfg.getTemplate("gen/JPA_CodeGenerator.ftl").process(data, new FileWriter(file));
-            }else if (projectConfig.dataBaseConfig.getOrmType()==OrmType.MYBATIS){
+            } else if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
                 data.put("basePackage", BASE_PACKAGE);
                 data.put("modelNameUpperCamel", "${modelNameUpperCamel}");
                 data.put("modelNameLowerCamel", "${modelNameLowerCamel}");
-                data.put("enabledSwagger",projectConfig.enable_swagger);
-                data.put("baseRequestMapping","${baseRequestMapping}");
+                data.put("enabledSwagger", projectConfig.enable_swagger);
+                data.put("baseRequestMapping", "${baseRequestMapping}");
 
                 File file = new File(getTestResourcesPath() + "generator/template/service/service.ftl");
                 if (!file.getParentFile().exists()) {
@@ -302,6 +311,8 @@ public final class CodeBuilder {
                 data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
 
                 data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
+                data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
+                data.put("jdbc_diver_class_name",jdbc_driver);
 
                 file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
                 if (!file.getParentFile().exists()) {
@@ -622,27 +633,19 @@ public final class CodeBuilder {
                         writer.write("            <artifactId>mysql-connector-java</artifactId>\n");
                         writer.write("        </dependency>\n");
                         break;
-//                    case ORACLE:
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-//                        writer.write("            <version>12.2.0.1</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        break;
-//                    case DB2:
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-//                        writer.write("            <version>12.2.0.1</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        break;
-//                    case SQLSERVER:
-//                        writer.write("        <dependency>\n");
-//                        writer.write("            <groupId>com.oracle.jdbc</groupId>\n");
-//                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-//                        writer.write("            <version>12.2.0.1</version>\n");
-//                        writer.write("        </dependency>\n");
-//                        break;
+                    case ORACLE:
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.github.noraui</groupId>\n");
+                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
+                        writer.write("            <version>12.2.0.1</version>\n");
+                        writer.write("        </dependency>\n");
+                        break;
+                    case SQLSERVER:
+                        writer.write("        <dependency>\n");
+                        writer.write("            <groupId>com.microsoft.sqlserver</groupId>\n");
+                        writer.write("            <artifactId>mssql-jdbc</artifactId>\n");
+                        writer.write("        </dependency>\n");
+                        break;
                 }
 
                 switch (projectConfig.dataBaseConfig.getOrmType()) {
@@ -718,10 +721,8 @@ public final class CodeBuilder {
                         writer.write("            <version>1.1.9</version>\n");
                         writer.write("        </dependency>\n");
                         break;
-//                    case C3P0:
-//                        break;
-//                    case HIKARICP:
-//                        break;
+                    case HIKARICP:
+                        break;
                     default:
                         writer.write("        <dependency>\n");
                         writer.write("            <groupId>com.alibaba</groupId>\n");
@@ -875,30 +876,24 @@ public final class CodeBuilder {
                     case MYSQL:
                         writer.write("    driver-class-name: com.mysql.jdbc.Driver\n");
                         break;
-//                    case ORACLE:
-//                        writer.write("    driver-class-name: oracle.jdbc.OracleDriver\n");
-//                        break;
-//                    case DB2:
-//                        writer.write("    driver-class-name: \n");
-//                        break;
-//                    case SQLSERVER:
-//                        writer.write("    driver-class-name: \n");
-//                        break;
+                    case ORACLE:
+                        writer.write("    driver-class-name: oracle.jdbc.OracleDriver\n");
+                        break;
+                    case SQLSERVER:
+                        writer.write("    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver\n");
+                        break;
 
                 }
                 switch (projectConfig.dataBaseConfig.getDataBaseConnectPool()) {
                     case DRUID:
                         writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
                         break;
-//                    case C3P0:
-//                        writer.write("    type: oracle.jdbc.OracleDriver\n");
-//                        break;
-//                    case HIKARICP:
-//                        writer.write("    type: \n");
-//                        break;
-//                    default:
-//                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
-//                        break;
+                    case HIKARICP:
+                        writer.write("    type: com.zaxxer.hikari.HikariDataSource\n");
+                        break;
+                    default:
+                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
+                        break;
 
                 }
 
@@ -910,6 +905,21 @@ public final class CodeBuilder {
                     writer.write("      ddl-auto: none\n");
                     writer.write("      naming: \n");
                     writer.write("        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl\n");
+                    writer.write("    properties: \n");
+                    writer.write("      hibernate: \n");
+                    switch (projectConfig.dataBaseConfig.getDataBaseType()) {
+                        case MYSQL:
+                            writer.write("        dialect: org.hibernate.dialect.MySQLDialect\n");
+                            break;
+                        case ORACLE:
+                            writer.write("        dialect: org.hibernate.dialect.OracleDialect\n");
+                            break;
+                        case SQLSERVER:
+                            writer.write("        dialect: org.hibernate.dialect.SQLServer2012Dialect\n");
+                            break;
+
+                    }
+
                 }
             }
 

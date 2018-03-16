@@ -13,11 +13,10 @@ public class Main {
                 .company("wymix")
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
-                .configure("jdbc:mysql://10.30.0.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930")
-                .setOrmType(OrmType.MYBATIS)
+                .configure("jdbc:mysql://192.168.10:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930")
+                .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.DRUID);
 
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces/").build(projectConfig);
-
     }
 }

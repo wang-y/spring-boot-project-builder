@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URI;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,9 +15,11 @@ import java.util.Map;
 
 public class CodeGenerator {
 
+    //JDBC配置，请修改为你项目的实际配置
+    private static final String JDBC_URL = "${database_url}";
     private static final String JDBC_USERNAME = "${database_user}";
     private static final String JDBC_PASSWORD = "${database_passowrd}";
-    private static final String JDBC_DIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private static final String JDBC_DIVER_CLASS_NAME = "${jdbc_diver_class_name}";
 
     private static final String PROJECT_PATH = System.getProperty("user.dir");//项目在硬盘上的基础路径
     private static final String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/test/resources/generator/template";//模板位置
@@ -25,6 +28,8 @@ public class CodeGenerator {
     private static final String RESOURCES_PATH = "/src/main/resources";//资源文件路径
 
     private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";
+
+    private static final String DATABASETYPE="${databasetype}";
 
     public static void main(String[] args) {
         genCode("test_table","Long");
@@ -41,10 +46,24 @@ public class CodeGenerator {
             } catch (ClassNotFoundException e1) {
                 e1.printStackTrace();
             }
-            con = DriverManager.getConnection(
-                    "jdbc:mysql://${host}:${port}/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
-                    JDBC_USERNAME, JDBC_PASSWORD);
-            String sql = "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA from COLUMNS where TABLE_SCHEMA='${database}' and TABLE_NAME=?";
+
+            String sql="";
+
+            if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")) {
+                String cleanURI = JDBC_URL.substring(5);
+                URI uri = URI.create(cleanURI);
+                String host=uri.getHost();
+                String port=String.valueOf(uri.getPort());
+                String database=uri.getPath().replaceFirst("/", "");
+                con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
+                      JDBC_USERNAME, JDBC_PASSWORD);
+                sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA from COLUMNS where TABLE_SCHEMA='"+database+"' and TABLE_NAME=?";
+            } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
+                //无oracle环境，暂不编辑
+            } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
+                //无sqlserver环境，暂不编辑
+            }
+
 
             pStemt = con.prepareStatement(sql);
             pStemt.setString(1, tableName);
@@ -223,7 +242,12 @@ public class CodeGenerator {
 
             if (StringUtils.isNotBlank(extras[i])) {
                 if (StringUtils.equalsIgnoreCase(extras[i], "auto_increment")) {
-                    sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
+                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE, "sql_server")) {
+                        sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
+                    } else if(StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
+                        sb.append("    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = \"CUST_SEQ\")\r\n");
+                        sb.append("    @SequenceGenerator(sequenceName = \"customer_seq\", allocationSize = 1, name = \"CUST_SEQ\")\r\n");
+                    }
                 }
             }
 

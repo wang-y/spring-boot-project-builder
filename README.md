@@ -9,10 +9,10 @@ public class Main {
         ProjectConfig projectConfig = ProjectConfig.project("demo")  //项目名
                 .company("wymix")  //公司名
                 .enableSwagger()  //启用swagger
-                .setDataBaseType(DataBaseType.MYSQL)  //指定数据库类型（目前仅支持mysql）
+                .setDataBaseType(DataBaseType.MYSQL)  //指定数据库类型（目前支持mysql/oracle/sqlserver）
                 .configure("jdbc:mysql://192.168.1.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930") //配置数据库
-                .setOrmType(OrmType.JPA) //指定持久层框架(目前仅JPA/MyBatis)
-                .setDataBaseConnectPool(DataBaseConnectPool.DRUID);//指定数据库连接池(目前仅支持DRUID)
+                .setOrmType(OrmType.JPA) //指定持久层框架(目前支持JPA/MyBatis)
+                .setDataBaseConnectPool(DataBaseConnectPool.DRUID);//指定数据库连接池(目前支持DRUID/HIKARICP)
 
         //向"/home/wymix/workspaces/study_diary_workspaces/"输出项目文件
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces/").build(projectConfig);
@@ -30,6 +30,9 @@ public class Main {
 
 src/test/java/com/company/project/CodeGenerator
 
+**注：**
+本人无oracle及sqlserver环境，所以只能用此项目生成JPA的项目包结构，无法通过CodeGenerator类生成数据表表对应的model/vo/repository/service/web代码
+
 ```java
 public static void main(String[] args) {
         genCode("test_table","Long");  //指定 表名(test_table) , 主键类型(Long)    生成对应表的model/vo/repository/service/web代码
@@ -44,6 +47,9 @@ public static void main(String[] args) {
 在生成的代码中
 
 src/test/java/com/company/project/CodeGenerator
+
+**注：**
+本人无oracle及sqlserver环境，所以通过CodeGenerator类生成数据表表对应的代码，未测试，不保证可用性。
 
 ```java
 public static void main(String[] args) {

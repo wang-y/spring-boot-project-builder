@@ -23,6 +23,8 @@ public class Main {
 
 一键生成 spring boot 项目代码
 
+**本项目在mysql环境下测试均通过！**
+
 
 # 使用JPA
 

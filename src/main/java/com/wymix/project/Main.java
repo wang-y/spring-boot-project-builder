@@ -9,14 +9,14 @@ import com.wymix.project.core.constant.OrmType;
 public class Main {
 
     public static void main(String[] args) {
-        ProjectConfig projectConfig = ProjectConfig.project("demo")
-                .company("wymix")
+        ProjectConfig projectConfig = ProjectConfig.project("dataservice1")
+                .company("orieange")
                 .enableSwagger()
-                .setDataBaseType(DataBaseType.MYSQL)
-                .configure("jdbc:mysql://192.168.10:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930")
+                .setDataBaseType(DataBaseType.SQLSERVER)
+                .configure("jdbc:sqlserver://localhost:1433;database=dataservice", "sa", "12345678")
                 .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.DRUID);
 
-        CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces/").build(projectConfig);
+        CodeBuilder.toFilePath("E:\\study_diary_workspaces").build(projectConfig);
     }
 }

@@ -2,6 +2,7 @@ package ${basepackage};
 
 import com.google.common.base.CaseFormat;
 import freemarker.template.TemplateExceptionHandler;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -59,7 +60,7 @@ public class CodeGenerator {
                 String database=uri.getPath().replaceFirst("/", "");
                 con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
                       JDBC_USERNAME, JDBC_PASSWORD);
-                sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA from COLUMNS where TABLE_SCHEMA='"+database+"' and TABLE_NAME=?";
+                sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA,NUMERIC_PRECISION,NUMERIC_SCALE from COLUMNS where TABLE_SCHEMA='" + database + "' and TABLE_NAME=?";
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
                 //无oracle环境，暂不编辑
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
@@ -67,6 +68,8 @@ public class CodeGenerator {
                 sql += "SELECT CAST(col.name AS NVARCHAR(1000)) AS COLUMN_NAME ,\n" +
                         "CAST(ISNULL(ep.[value], '') AS NVARCHAR(1000)) AS COLUMN_COMMENT ,\n" +
                         "CAST(t.name AS NVARCHAR(128)) AS DATA_TYPE ,\n" +
+                        "ISNULL(COLUMNPROPERTY(col.id, col.name, 'Precision'), 0) AS NUMERIC_PRECISION ,\n" +
+                        "ISNULL(COLUMNPROPERTY(col.id, col.name, 'Scale'), 0) AS NUMERIC_SCALE ,\n" +
                         "CASE WHEN EXISTS ( SELECT   1\n" +
                         "    FROM dbo.sysindexes si \n" +
                         "    INNER JOIN dbo.sysindexkeys sik ON si.id = sik.id AND si.indid = sik.indid\n" +
@@ -81,7 +84,7 @@ public class CodeGenerator {
                         "LEFT  JOIN dbo.syscomments comm ON col.cdefault = comm.id\n" +
                         "LEFT  JOIN sys.extended_properties ep ON col.id = ep.major_id AND col.colid = ep.minor_id AND ep.name = 'MS_Description'\n" +
                         "LEFT  JOIN sys.extended_properties epTwo ON obj.id = epTwo.major_id AND epTwo.minor_id = 0 AND epTwo.name = 'MS_Description'\n" +
-                        "WHERE obj.name = ? \n" ;
+                        "WHERE obj.name = ? \n";
             }
 
 
@@ -89,21 +92,30 @@ public class CodeGenerator {
             pStemt.setString(1, tableName);
             rs = pStemt.executeQuery();
 
-            List<String> colnames = new ArrayList<>();
-            List<String> colTypes = new ArrayList<>();
-            List<String> colComments = new ArrayList<>();
-            List<String> colKeys = new ArrayList<>();
-            List<String> extras = new ArrayList<>();
+            List<ColumnInfo> columnInfos = new ArrayList<>();
 
             boolean f_util = false; // 是否需要导入包java.util.*
             boolean f_sql = false;
             while (rs.next()) {
-                colnames.add( rs.getString("COLUMN_NAME"));
+                String column_name = rs.getString("COLUMN_NAME");
                 String data_type = rs.getString("DATA_TYPE");
-                colTypes.add(data_type);
-                colComments.add( rs.getString("COLUMN_COMMENT"));
-                colKeys.add( rs.getString("COLUMN_KEY"));
-                extras.add( rs.getString("EXTRA"));
+                String column_comment = rs.getString("COLUMN_COMMENT");
+                String column_key = rs.getString("COLUMN_KEY");
+                String extra = rs.getString("EXTRA");
+                Integer precision = rs.getInt("NUMERIC_PRECISION");
+                Integer scale = rs.getInt("NUMERIC_SCALE");
+
+                ColumnInfo columnInfo = new ColumnInfo();
+                columnInfo.setName(column_name);
+                columnInfo.setType(data_type);
+                columnInfo.setPrecision(precision);
+                columnInfo.setScale(scale);
+                columnInfo.setComment(column_comment);
+                columnInfo.setColKey(column_key);
+                columnInfo.setExtra(extra);
+
+                columnInfos.add(columnInfo);
+
                 if (data_type.equalsIgnoreCase("datetime") || data_type.equalsIgnoreCase("date")) {
                     f_util = true;
                 }
@@ -111,8 +123,8 @@ public class CodeGenerator {
                     f_sql = true;
                 }
             }
-            String entitycontent = buildEntity(colnames.toArray(new String[]{}), colTypes.toArray(new String[]{}), colKeys.toArray(new String[]{}), extras.toArray(new String[]{}), tableName, modelName, f_util, f_sql,colComments.toArray(new String[]{}));
-            String vocontent = buildVo(colnames.toArray(new String[]{}), colTypes.toArray(new String[]{}), colKeys.toArray(new String[]{}), extras.toArray(new String[]{}), StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util,colComments.toArray(new String[]{}));
+            String entitycontent = buildEntity(columnInfos, tableName, modelName, f_util, f_sql);
+            String vocontent = buildVo(columnInfos, StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util);
 
             String modelPackage = "${businesspackage}.model";
             String voPackage = "${businesspackage}.vo";
@@ -159,22 +171,10 @@ public class CodeGenerator {
         }
     }
 
-    private static void processAllMethod(StringBuffer sb, String[] colnames, String[] colTypes) {
-        for (int i = 0; i < colnames.length; i++) {
-            sb.append("    public " + sqlType2JavaType(colTypes[i]) + " get" + tableNameConvertUpperCamel(colnames[i]) + "(){\r\n");
-            sb.append("        return " + colnames[i] + ";\r\n");
-            sb.append("    }\r\n\n");
 
-            sb.append("    public void set" + tableNameConvertUpperCamel(colnames[i]) + "(" + sqlType2JavaType(colTypes[i]) + " "
-                    + colnames[i] + "){\r\n");
-            sb.append("        this." + colnames[i] + "=" + colnames[i] + ";\r\n");
-            sb.append("    }\r\n\n");
-        }
-    }
-
-    private static String buildEntity(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, String modelname, boolean f_util, boolean f_sql,String[] colComments) {
+    private static String buildEntity(List<ColumnInfo> columnInfos, String tableName, String modelname, boolean f_util, boolean f_sql) {
         StringBuffer sb = new StringBuffer();
-        sb.append("package ${businesspackage}.model;\r\n\r\n");
+        sb.append("package ${basepackage}.business.model;\r\n\r\n");
         sb.append("import lombok.Data;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         sb.append("import javax.persistence.*;\r\n");
@@ -196,7 +196,7 @@ public class CodeGenerator {
         sb.append("\r\n@Entity");
         sb.append("\r\n@Table(name = \"" + tableName + "\")");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(StringUtils.isNotBlank(modelname) ? modelname : tableName) + " implements Serializable {\r\n\r\n");
-        processAllAttrs(sb, colnames, colTypes, colKeys, extras,colComments);// 属性
+        processAllAttrs(sb, columnInfos);// 属性
         //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
@@ -204,10 +204,10 @@ public class CodeGenerator {
         return sb.toString();
     }
 
-    private static String buildVo(String[] colnames, String[] colTypes, String[] colKeys, String[] extras, String tableName, boolean f_util,String[] colComments) {
+    private static String buildVo(List<ColumnInfo> columnInfos, String tableName, boolean f_util) {
         StringBuffer sb = new StringBuffer();
-        sb.append("package ${businesspackage}.vo;\r\n\r\n");
-        if(ENABLED_SWAGGER) {
+        sb.append("package ${basepackage}.business.vo;\r\n\r\n");
+        if (ENABLED_SWAGGER) {
             sb.append("import io.swagger.annotations.ApiModelProperty;\r\n");
         }
         sb.append("import lombok.Data;\r\n\n");
@@ -226,7 +226,7 @@ public class CodeGenerator {
         // 实体部分
         sb.append("\r\n@Data");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(tableName) + "Vo implements Serializable {\r\n\r\n");
-        processAllAttrs2(sb, colnames, colTypes,colComments);// 属性
+        processAllAttrs2(sb, columnInfos);// 属性
         //processAllMethod(sb, colnames, colTypes);// get set方法
         sb.append("}\r\n");
 
@@ -234,48 +234,48 @@ public class CodeGenerator {
         return sb.toString();
     }
 
-    private static void processAllAttrs2(StringBuffer sb, String[] colnames, String[] colTypes,String[] colComments) {
+    private static void processAllAttrs2(StringBuffer sb, List<ColumnInfo> columnInfos) {
 
-        for (int i = 0; i < colnames.length; i++) {
-            String javaType = sqlType2JavaType(colTypes[i]);
-            if(ENABLED_SWAGGER&&StringUtils.isNotBlank(colComments[i])){
-                sb.append("    @ApiModelProperty(value = \"" + colComments[i] + "\")\r\n");
+        for (ColumnInfo info : columnInfos) {
+            String javaType = sqlType2JavaType(info);
+            if (ENABLED_SWAGGER && StringUtils.isNotBlank(info.getComment())) {
+                sb.append("    @ApiModelProperty(value = \"" + info.getComment() + "\")\r\n");
             }
-            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(colnames[i]) + ";\r\n\r\n");
+            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(info.getName()) + ";\r\n\r\n");
         }
 
     }
 
-    private static void processAllAttrs(StringBuffer sb, String[] colnames, String[] colTypes, String[] colKeys, String[] extras,String[] colComments) {
+    private static void processAllAttrs(StringBuffer sb, List<ColumnInfo> columnInfos) {
 
-        for (int i = 0; i < colnames.length; i++) {
+        for (ColumnInfo info : columnInfos) {
 
-            if (StringUtils.isNotBlank(colKeys[i])) {
-                if (StringUtils.equalsIgnoreCase(colKeys[i], "PRI")) {
+            if (StringUtils.isNotBlank(info.getColKey())) {
+                if (StringUtils.equalsIgnoreCase(info.getColKey(), "PRI")) {
                     sb.append("    @Id\r\n");
                 }
             }
 
-            if (StringUtils.isNotBlank(extras[i])) {
-                if (StringUtils.equalsIgnoreCase(extras[i], "auto_increment")) {
-                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
+            if (StringUtils.isNotBlank(info.getExtra())) {
+                if (StringUtils.equalsIgnoreCase(info.getExtra(), "auto_increment")) {
+                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql") || StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
                         sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
-                    } else if(StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
+                    } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
                         sb.append("    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = \"CUST_SEQ\")\r\n");
                         sb.append("    @SequenceGenerator(sequenceName = \"customer_seq\", allocationSize = 1, name = \"CUST_SEQ\")\r\n");
                     }
                 }
             }
 
-            sb.append("    @Column(name = \"" + colnames[i] + "\")\r\n");
+            sb.append("    @Column(name = \"" + info.getName() + "\")\r\n");
 
-            String javaType = sqlType2JavaType(colTypes[i]);
+            String javaType = sqlType2JavaType(info);
             if (StringUtils.equalsIgnoreCase(javaType, "Date")) {
                 sb.append("    @Temporal(value = TemporalType.TIMESTAMP)\r\n");
             }
-            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(colnames[i]) + ";");
-            if (StringUtils.isNotBlank(colComments[i])){
-                sb.append("  // "+colComments[i]);
+            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(info.getName()) + ";");
+            if (StringUtils.isNotBlank(info.getComment())) {
+                sb.append("  // " + info.getComment());
             }
             sb.append("\r\n\r\n");
         }
@@ -285,11 +285,11 @@ public class CodeGenerator {
     /**
      * 功能：获得列的数据类型
      *
-     * @param sqlType
+     * @param info
      * @return
      */
-    private static String sqlType2JavaType(String sqlType) {
-
+    private static String sqlType2JavaType(ColumnInfo info) {
+        String sqlType = info.getType();
         if (sqlType.equalsIgnoreCase("bit")) {
             return "Boolean";
         } else if (sqlType.equalsIgnoreCase("tinyint")) {
@@ -302,8 +302,14 @@ public class CodeGenerator {
             return "Long";
         } else if (sqlType.equalsIgnoreCase("float")) {
             return "Float";
-        } else if (sqlType.equalsIgnoreCase("double") || sqlType.equalsIgnoreCase("decimal")
-                || sqlType.equalsIgnoreCase("numeric") || sqlType.equalsIgnoreCase("real")
+        } else if (sqlType.equalsIgnoreCase("decimal")
+                || sqlType.equalsIgnoreCase("numeric")) {
+            if(info.getScale()>0){
+                return "Double";
+            }else{
+                return "Long";
+            }
+        } else if (sqlType.equalsIgnoreCase("double") || sqlType.equalsIgnoreCase("real")
                 || sqlType.equalsIgnoreCase("money") || sqlType.equalsIgnoreCase("smallmoney")) {
             return "Double";
         } else if (sqlType.equalsIgnoreCase("varchar") || sqlType.equalsIgnoreCase("char")
@@ -410,5 +416,18 @@ public class CodeGenerator {
         genRepository(name,pkType);
         genService(name,pkType);
         genWeb(name,pkType);
+    }
+
+    @Data
+    private static class ColumnInfo {
+
+        private String name;
+        private String type;
+        private Integer precision;
+        private Integer scale;
+        private String comment;
+        private String colKey;
+        private String extra;
+
     }
 }

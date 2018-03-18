@@ -6,16 +6,14 @@ import ${businesspackage}.service.${modelName}Service;
 import ${businesspackage}.vo.${modelName}Vo;
 import ${corepackage}.repo.IBasicRepository;
 import ${corepackage}.service.impl.BasicService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Slf4j
 @Service
 public class ${modelName}ServiceImpl extends BasicService<${modelName}Vo,${modelName},${PKType}> implements ${modelName}Service {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(${modelName}ServiceImpl.class);
 
     @Resource
     private ${modelName}Repository repository;

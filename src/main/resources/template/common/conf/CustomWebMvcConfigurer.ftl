@@ -6,8 +6,7 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import ${corepackage}.common.Result;
 import ${corepackage}.common.ResultCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,10 +30,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class CustomWebMvcConfigurer implements WebMvcConfigurer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfigurer.class);
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -73,7 +71,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                     } else {
                         message = e.getMessage();
                     }
-                    LOGGER.error(message, e);
+                    log.error(message, e);
                 }
                 responseResult(response, result);
                 return new ModelAndView();
@@ -89,7 +87,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         try {
             response.getWriter().write(JSON.toJSONString(result));
         } catch (IOException ex) {
-            LOGGER.error(ex.getMessage());
+            log.error(ex.getMessage());
         }
     }
 

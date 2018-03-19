@@ -23,7 +23,7 @@ public class Main {
 
 一键生成 spring boot 项目代码
 
-**本项目在mysql环境下测试均通过！**
+**本项目在mysql/sqlserver环境下测试均通过！**
 
 
 # 使用JPA
@@ -33,7 +33,7 @@ public class Main {
 src/test/java/com/company/project/CodeGenerator
 
 **注：**
-本人无oracle及sqlserver环境，所以只能用此项目生成JPA的项目包结构，无法通过CodeGenerator类生成数据表表对应的model/vo/repository/service/web代码
+本人无oracle环境，所以只能用此项目生成JPA的项目包结构，无法通过CodeGenerator类生成数据表表对应的model/vo/repository/service/web代码
 
 ```java
 public static void main(String[] args) {
@@ -51,7 +51,7 @@ public static void main(String[] args) {
 src/test/java/com/company/project/CodeGenerator
 
 **注：**
-本人无oracle及sqlserver环境，所以通过CodeGenerator类生成数据表表对应的代码，未测试，不保证可用性。
+本人无oracle环境，所以通过CodeGenerator类生成数据表表对应的代码，未测试，不保证可用性。
 
 ```java
 public static void main(String[] args) {

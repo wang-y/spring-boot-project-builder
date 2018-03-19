@@ -61,7 +61,25 @@ public class CodeGenerator {
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
                 //无oracle环境，暂不编辑
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
-                //无sqlserver环境，暂不编辑
+                con = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+                sql += "SELECT CAST(col.name AS NVARCHAR(1000)) AS COLUMN_NAME ,\n" +
+                        "CAST(ISNULL(ep.[value], '') AS NVARCHAR(1000)) AS COLUMN_COMMENT ,\n" +
+                        "CAST(t.name AS NVARCHAR(128)) AS DATA_TYPE ,\n" +
+                        "CASE WHEN EXISTS ( SELECT   1\n" +
+                        "    FROM dbo.sysindexes si \n" +
+                        "    INNER JOIN dbo.sysindexkeys sik ON si.id = sik.id AND si.indid = sik.indid\n" +
+                        "    INNER JOIN dbo.syscolumns sc ON sc.id = sik.id AND sc.colid = sik.colid\n" +
+                        "    INNER JOIN dbo.sysobjects so ON so.name = si.name AND so.xtype = 'PK'\n" +
+                        "    WHERE sc.id = col.id AND sc.colid = col.colid ) \n" +
+                        "THEN 'PRI' ELSE 'FALSE' END AS COLUMN_KEY ,\n" +
+                        "CASE WHEN COLUMNPROPERTY(col.id, col.name, 'IsIdentity') = 1 THEN 'auto_increment' ELSE 'FALSE'  END AS EXTRA\n" +
+                        "FROM dbo.syscolumns col\n" +
+                        "LEFT  JOIN dbo.systypes t ON col.xtype = t.xusertype\n" +
+                        "INNER JOIN dbo.sysobjects obj ON col.id = obj.id AND obj.xtype = 'U' AND obj.status >= 0\n" +
+                        "LEFT  JOIN dbo.syscomments comm ON col.cdefault = comm.id\n" +
+                        "LEFT  JOIN sys.extended_properties ep ON col.id = ep.major_id AND col.colid = ep.minor_id AND ep.name = 'MS_Description'\n" +
+                        "LEFT  JOIN sys.extended_properties epTwo ON obj.id = epTwo.major_id AND epTwo.minor_id = 0 AND epTwo.name = 'MS_Description'\n" +
+                        "WHERE obj.name = ? \n" ;
             }
 
 
@@ -69,34 +87,30 @@ public class CodeGenerator {
             pStemt.setString(1, tableName);
             rs = pStemt.executeQuery();
 
-            rs.last();
-            int size = rs.getRow(); // 统计列
-            rs.beforeFirst();
-            String[] colnames = new String[size];
-            String[] colTypes = new String[size];
-            String[] colComments = new String[size];
-            String[] colKeys = new String[size];
-            String[] extras = new String[size];
+            List<String> colnames = new ArrayList<>();
+            List<String> colTypes = new ArrayList<>();
+            List<String> colComments = new ArrayList<>();
+            List<String> colKeys = new ArrayList<>();
+            List<String> extras = new ArrayList<>();
 
             boolean f_util = false; // 是否需要导入包java.util.*
             boolean f_sql = false;
-            int index = 0;
             while (rs.next()) {
-                colnames[index] = rs.getString("COLUMN_NAME");
-                colTypes[index] = rs.getString("DATA_TYPE");
-                colComments[index] = rs.getString("COLUMN_COMMENT");
-                colKeys[index] = rs.getString("COLUMN_KEY");
-                extras[index] = rs.getString("EXTRA");
-                if (colTypes[index].equalsIgnoreCase("datetime") || colTypes[index].equalsIgnoreCase("date")) {
+                colnames.add( rs.getString("COLUMN_NAME"));
+                String data_type = rs.getString("DATA_TYPE");
+                colTypes.add(data_type);
+                colComments.add( rs.getString("COLUMN_COMMENT"));
+                colKeys.add( rs.getString("COLUMN_KEY"));
+                extras.add( rs.getString("EXTRA"));
+                if (data_type.equalsIgnoreCase("datetime") || data_type.equalsIgnoreCase("date")) {
                     f_util = true;
                 }
-                if (colTypes[index].equalsIgnoreCase("image") || colTypes[index].equalsIgnoreCase("text")) {
+                if (data_type.equalsIgnoreCase("image") || data_type.equalsIgnoreCase("text")) {
                     f_sql = true;
                 }
-                index++;
             }
-            String entitycontent = buildEntity(colnames, colTypes, colKeys, extras, tableName, modelName, f_util, f_sql,colComments);
-            String vocontent = buildVo(colnames, colTypes, colKeys, extras, StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util,colComments);
+            String entitycontent = buildEntity(colnames.toArray(new String[]{}), colTypes.toArray(new String[]{}), colKeys.toArray(new String[]{}), extras.toArray(new String[]{}), tableName, modelName, f_util, f_sql,colComments.toArray(new String[]{}));
+            String vocontent = buildVo(colnames.toArray(new String[]{}), colTypes.toArray(new String[]{}), colKeys.toArray(new String[]{}), extras.toArray(new String[]{}), StringUtils.isNotBlank(modelName) ? modelName : tableName, f_util,colComments.toArray(new String[]{}));
 
             String modelPackage = "${businesspackage}.model";
             String voPackage = "${businesspackage}.vo";
@@ -242,7 +256,7 @@ public class CodeGenerator {
 
             if (StringUtils.isNotBlank(extras[i])) {
                 if (StringUtils.equalsIgnoreCase(extras[i], "auto_increment")) {
-                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE, "sql_server")) {
+                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
                         sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
                     } else if(StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
                         sb.append("    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = \"CUST_SEQ\")\r\n");

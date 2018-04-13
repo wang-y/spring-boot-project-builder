@@ -577,7 +577,7 @@ public final class CodeBuilder {
             writer.write("    <parent>\n");
             writer.write("        <groupId>org.springframework.boot</groupId>\n");
             writer.write("        <artifactId>spring-boot-starter-parent</artifactId>\n");
-            writer.write("        <version>2.0.0.RELEASE</version>\n");
+            writer.write("        <version>2.0.1.RELEASE</version>\n");
             writer.write("    </parent>\n\n");
 
             writer.write("    <groupId>com." + this.projectConfig.company + "</groupId>\n");

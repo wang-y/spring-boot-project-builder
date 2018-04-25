@@ -757,12 +757,14 @@ public final class CodeBuilder {
             writer.write("            <version>3.7</version>\n");
             writer.write("        </dependency>\n");
 
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>org.freemarker</groupId>\n");
-            writer.write("            <artifactId>freemarker</artifactId>\n");
-            writer.write("            <version>2.3.23</version>\n");
-            writer.write("            <scope>test</scope>\n");
-            writer.write("        </dependency>\n");
+            if (projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE) {
+                writer.write("        <dependency>\n");
+                writer.write("            <groupId>org.freemarker</groupId>\n");
+                writer.write("            <artifactId>freemarker</artifactId>\n");
+                writer.write("            <version>2.3.23</version>\n");
+                writer.write("            <scope>test</scope>\n");
+                writer.write("        </dependency>\n");
+            }
 
             writer.write("        <dependency>\n");
             writer.write("            <groupId>com.google.guava</groupId>\n");
@@ -806,22 +808,26 @@ public final class CodeBuilder {
             writer.write("                    <target>${java.version}</target>\n");
             writer.write("                </configuration>\n");
             writer.write("            </plugin>\n");
-            writer.write("            <plugin>\n");
-            writer.write("                <groupId>com.mysema.maven</groupId>\n");
-            writer.write("                <artifactId>apt-maven-plugin</artifactId>\n");
-            writer.write("                <version>1.1.3</version>\n");
-            writer.write("                <executions>\n");
-            writer.write("                    <execution>\n");
-            writer.write("                        <goals>\n");
-            writer.write("                            <goal>process</goal>\n");
-            writer.write("                        </goals>\n");
-            writer.write("                        <configuration>\n");
-            writer.write("                            <outputDirectory>target/generated-sources/java</outputDirectory>\n");
-            writer.write("                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>\n");
-            writer.write("                        </configuration>\n");
-            writer.write("                    </execution>\n");
-            writer.write("                </executions>\n");
-            writer.write("            </plugin>\n");
+
+            if (projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE&&projectConfig.dataBaseConfig.getOrmType()==OrmType.JPA) {
+                writer.write("            <plugin>\n");
+                writer.write("                <groupId>com.mysema.maven</groupId>\n");
+                writer.write("                <artifactId>apt-maven-plugin</artifactId>\n");
+                writer.write("                <version>1.1.3</version>\n");
+                writer.write("                <executions>\n");
+                writer.write("                    <execution>\n");
+                writer.write("                        <goals>\n");
+                writer.write("                            <goal>process</goal>\n");
+                writer.write("                        </goals>\n");
+                writer.write("                        <configuration>\n");
+                writer.write("                            <outputDirectory>target/generated-sources/java</outputDirectory>\n");
+                writer.write("                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>\n");
+                writer.write("                        </configuration>\n");
+                writer.write("                    </execution>\n");
+                writer.write("                </executions>\n");
+                writer.write("            </plugin>\n");
+            }
+
             writer.write("        </plugins>\n");
             writer.write("    </build>");
 

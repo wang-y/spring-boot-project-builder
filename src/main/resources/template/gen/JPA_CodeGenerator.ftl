@@ -61,8 +61,6 @@ public class CodeGenerator {
                 con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
                       JDBC_USERNAME, JDBC_PASSWORD);
                 sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA,NUMERIC_PRECISION,NUMERIC_SCALE from COLUMNS where TABLE_SCHEMA='" + database + "' and TABLE_NAME=?";
-            } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
-                //无oracle环境，暂不编辑
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
                 con = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
                 sql += "SELECT CAST(col.name AS NVARCHAR(1000)) AS COLUMN_NAME ,\n" +
@@ -258,12 +256,7 @@ public class CodeGenerator {
 
             if (StringUtils.isNotBlank(info.getExtra())) {
                 if (StringUtils.equalsIgnoreCase(info.getExtra(), "auto_increment")) {
-                    if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql") || StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
-                        sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
-                    } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "oracle")) {
-                        sb.append("    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = \"CUST_SEQ\")\r\n");
-                        sb.append("    @SequenceGenerator(sequenceName = \"customer_seq\", allocationSize = 1, name = \"CUST_SEQ\")\r\n");
-                    }
+                    sb.append("    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n");
                 }
             }
 

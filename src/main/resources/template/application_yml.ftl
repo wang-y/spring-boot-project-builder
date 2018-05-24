@@ -18,9 +18,6 @@ spring:
         <#case "MYSQL">
     driver-class-name: com.mysql.jdbc.Driver
         <#break>
-        <#case "ORACLE">
-    driver-class-name: oracle.jdbc.OracleDriver
-        <#break>
         <#case "SQLSERVER">
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
         <#break>
@@ -49,9 +46,6 @@ spring:
         <#switch databaseType>
             <#case "MYSQL">
         dialect: org.hibernate.dialect.MySQLDialect
-            <#break>
-            <#case "ORACLE">
-        dialect: org.hibernate.dialect.OracleDialect
             <#break>
             <#case "SQLSERVER">
         dialect: org.hibernate.dialect.SQLServer2012Dialect

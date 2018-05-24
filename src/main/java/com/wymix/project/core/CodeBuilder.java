@@ -235,9 +235,6 @@ public final class CodeBuilder {
                 case MYSQL:
                     jdbc_driver += "com.mysql.jdbc.Driver";
                     break;
-                case ORACLE:
-                    jdbc_driver += "oracle.jdbc.OracleDriver";
-                    break;
                 case SQLSERVER:
                     jdbc_driver += "com.microsoft.sqlserver.jdbc.SQLServerDriver";
                     break;
@@ -600,7 +597,6 @@ public final class CodeBuilder {
 
             data.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
             data.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
-            data.put("ORACLE_DRIVER_VERSION", VersionConstants.ORACLE_DRIVER_VERSION);
             data.put("FASTJSON_VERSION", VersionConstants.FASTJSON_VERSION);
 
 

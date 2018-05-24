@@ -64,13 +64,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <#break>
-        <#case "ORACLE">
-        <dependency>
-            <groupId>com.github.noraui</groupId>
-            <artifactId>ojdbc8</artifactId>
-            <version>${ORACLE_DRIVER_VERSION}</version>
-        </dependency>
-        <#break>
         <#case "SQLSERVER">
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>

@@ -6,8 +6,6 @@ public final class VersionConstants {
 
     public final static String DRUID_VERSION="1.1.9";
 
-    public final static String ORACLE_DRIVER_VERSION="12.2.0.1";
-
     public final static String FASTJSON_VERSION="1.2.46";
 
 }

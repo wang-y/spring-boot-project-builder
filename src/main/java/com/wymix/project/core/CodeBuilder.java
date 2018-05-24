@@ -2,9 +2,12 @@ package com.wymix.project.core;
 
 import com.wymix.project.core.constant.DataBaseType;
 import com.wymix.project.core.constant.OrmType;
+import com.wymix.project.core.constant.VersionConstants;
 import freemarker.template.TemplateExceptionHandler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +41,6 @@ public final class CodeBuilder {
     private static String packageConvertPath(String packageName) {
         return String.format("/%s/", packageName.contains(".") ? packageName.replaceAll("\\.", "/") : packageName);
     }
-
-    private final static String POM_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" +
-            "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-            "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
-            "    <modelVersion>4.0.0</modelVersion>\n\n";
-
-    private final static String POM_FOOTER = "\n\n</project>";
 
     private String getRoot() {
         return this.path + "/" + this.projectConfig.project;
@@ -98,9 +93,8 @@ public final class CodeBuilder {
         BASE_PACKAGE_PATH = packageConvertPath(BASE_PACKAGE);
 
         touchDir();
-        touchConfigFile();
-        modifyPom();
-        modifyApplication();
+        createPom();
+        createApplication();
         createStarter();
 
         switch (projectConfig.dataBaseConfig.getOrmType()) {
@@ -211,7 +205,7 @@ public final class CodeBuilder {
 
     private void copyCodeTemplate() {
         String jdbc_driver = "";
-        if(projectConfig.dataBaseConfig!=null&&projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE){
+        if (projectConfig.dataBaseConfig != null && projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
             switch (projectConfig.dataBaseConfig.getDataBaseType()) {
                 case MYSQL:
                     jdbc_driver += "com.mysql.jdbc.Driver";
@@ -270,7 +264,7 @@ public final class CodeBuilder {
                 data.put("businesspackage", PACKAGE_BUSINESS);
                 data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
                 data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
-                data.put("jdbc_diver_class_name",jdbc_driver);
+                data.put("jdbc_diver_class_name", jdbc_driver);
 
                 file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
                 if (!file.getParentFile().exists()) {
@@ -312,7 +306,7 @@ public final class CodeBuilder {
 
                 data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
                 data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
-                data.put("jdbc_diver_class_name",jdbc_driver);
+                data.put("jdbc_diver_class_name", jdbc_driver);
 
                 file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
                 if (!file.getParentFile().exists()) {
@@ -565,435 +559,68 @@ public final class CodeBuilder {
         System.out.println("启动类 Application.java 生成完毕！");
     }
 
-    private void modifyPom() {
-        FileOutputStream outputStream = null;
-        PrintWriter writer = null;
+    private void createPom() {
         try {
-            String pom = getRoot() + "/pom.xml";
-            File file = new File(pom);
-            outputStream = new FileOutputStream(file);
-            writer = new PrintWriter(outputStream);
-            writer.write(POM_HEADER);
-            writer.write("    <parent>\n");
-            writer.write("        <groupId>org.springframework.boot</groupId>\n");
-            writer.write("        <artifactId>spring-boot-starter-parent</artifactId>\n");
-            writer.write("        <version>2.0.2.RELEASE</version>\n");
-            writer.write("    </parent>\n\n");
+            freemarker.template.Configuration cfg = getConfiguration();
+            Map<String, Object> data = new HashMap<>();
 
-            writer.write("    <groupId>com." + this.projectConfig.company + "</groupId>\n");
-            writer.write("    <artifactId>" + this.projectConfig.project + "</artifactId>\n");
-            writer.write("    <version>0.0.1-SNAPSHOT</version>\n");
-            writer.write("    <packaging>jar</packaging>\n\n");
+            data.put("groupId", this.projectConfig.company);
+            data.put("artifactId", this.projectConfig.project);
+            data.put("enabledSwagger", this.projectConfig.enable_swagger);
+            data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
+            data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());
+            data.put("ormType", this.projectConfig.dataBaseConfig.getOrmType().toString());
+            data.put("databaseConnectPool", this.projectConfig.dataBaseConfig.getDataBaseConnectPool().toString());
 
-            writer.write("    <properties>\n");
-            writer.write("        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n");
-            writer.write("        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>\n");
-            writer.write("        <java.version>1.8</java.version>\n");
-            writer.write("    </properties>\n\n");
 
-            writer.write("    <dependencies>\n");
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>org.springframework.boot</groupId>\n");
-            writer.write("            <artifactId>spring-boot-starter-web</artifactId>\n");
-            writer.write("            <exclusions>\n");
-            writer.write("                <exclusion>\n");
-            writer.write("                    <groupId>org.springframework.boot</groupId>\n");
-            writer.write("                    <artifactId>spring-boot-starter-tomcat</artifactId>\n");
-            writer.write("                </exclusion>\n");
-            writer.write("            </exclusions>\n");
-            writer.write("        </dependency>\n");
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>org.springframework.boot</groupId>\n");
-            writer.write("            <artifactId>spring-boot-starter-undertow</artifactId>\n");
-            writer.write("        </dependency>\n");
+            data.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
+            data.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
+            data.put("ORACLE_DRIVER_VERSION", VersionConstants.ORACLE_DRIVER_VERSION);
+            data.put("FASTJSON_VERSION", VersionConstants.FASTJSON_VERSION);
 
-            if (projectConfig.enable_swagger) {
-                writer.write("        <dependency>\n");
-                writer.write("            <groupId>io.springfox</groupId>\n");
-                writer.write("            <artifactId>springfox-swagger2</artifactId>\n");
-                writer.write("            <version>2.7.0</version>\n");
-                writer.write("        </dependency>\n");
-                writer.write("        <dependency>\n");
-                writer.write("            <groupId>io.springfox</groupId>\n");
-                writer.write("            <artifactId>springfox-swagger-ui</artifactId>\n");
-                writer.write("            <version>2.7.0</version>\n");
-                writer.write("        </dependency>\n");
-                writer.write("        <dependency>\n");
-                writer.write("            <groupId>io.springfox</groupId>\n");
-                writer.write("            <artifactId>springfox-staticdocs</artifactId>\n");
-                writer.write("            <version>2.6.1</version>\n");
-                writer.write("        </dependency>\n");
+
+            File file = new File(getRoot() + "/pom.xml");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
             }
-
-            if (projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-                switch (projectConfig.dataBaseConfig.getDataBaseType()) {
-                    case MYSQL:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>mysql</groupId>\n");
-                        writer.write("            <artifactId>mysql-connector-java</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case ORACLE:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.github.noraui</groupId>\n");
-                        writer.write("            <artifactId>ojdbc8</artifactId>\n");
-                        writer.write("            <version>12.2.0.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case SQLSERVER:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.microsoft.sqlserver</groupId>\n");
-                        writer.write("            <artifactId>mssql-jdbc</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                }
-
-                switch (projectConfig.dataBaseConfig.getOrmType()) {
-                    case JPA:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.springframework.boot</groupId>\n");
-                        writer.write("            <artifactId>spring-boot-starter-data-jpa</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.querydsl</groupId>\n");
-                        writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.querydsl</groupId>\n");
-                        writer.write("            <artifactId>querydsl-apt</artifactId>\n");
-                        writer.write("            <scope>provided</scope>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case MYBATIS:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.springframework.boot</groupId>\n");
-                        writer.write("            <artifactId>spring-boot-starter-jdbc</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.mybatis</groupId>\n");
-                        writer.write("            <artifactId>mybatis-spring</artifactId>\n");
-                        writer.write("            <version>1.3.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.mybatis</groupId>\n");
-                        writer.write("            <artifactId>mybatis</artifactId>\n");
-                        writer.write("            <version>3.4.5</version>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>tk.mybatis</groupId>\n");
-                        writer.write("            <artifactId>mapper</artifactId>\n");
-                        writer.write("            <version>3.4.2</version>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.github.pagehelper</groupId>\n");
-                        writer.write("            <artifactId>pagehelper</artifactId>\n");
-                        writer.write("            <version>4.2.1</version>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.mybatis.generator</groupId>\n");
-                        writer.write("            <artifactId>mybatis-generator-core</artifactId>\n");
-                        writer.write("            <version>1.3.5</version>\n");
-                        writer.write("            <scope>test</scope>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    default:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>org.springframework.boot</groupId>\n");
-                        writer.write("            <artifactId>spring-boot-starter-data-jpa</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.querydsl</groupId>\n");
-                        writer.write("            <artifactId>querydsl-jpa</artifactId>\n");
-                        writer.write("        </dependency>\n");
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.querydsl</groupId>\n");
-                        writer.write("            <artifactId>querydsl-apt</artifactId>\n");
-                        writer.write("            <scope>provided</scope>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                }
-
-                switch (projectConfig.dataBaseConfig.getDataBaseConnectPool()) {
-                    case DRUID:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.alibaba</groupId>\n");
-                        writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.9</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                    case HIKARICP:
-                        break;
-                    default:
-                        writer.write("        <dependency>\n");
-                        writer.write("            <groupId>com.alibaba</groupId>\n");
-                        writer.write("            <artifactId>druid-spring-boot-starter</artifactId>\n");
-                        writer.write("            <version>1.1.9</version>\n");
-                        writer.write("        </dependency>\n");
-                        break;
-                }
-            }
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>com.alibaba</groupId>\n");
-            writer.write("            <artifactId>fastjson</artifactId>\n");
-            writer.write("            <version>1.2.46</version>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>org.projectlombok</groupId>\n");
-            writer.write("            <artifactId>lombok</artifactId>\n");
-            writer.write("            <version>1.16.20</version>\n");
-            writer.write("            <scope>provided</scope>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>commons-codec</groupId>\n");
-            writer.write("            <artifactId>commons-codec</artifactId>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>org.apache.commons</groupId>\n");
-            writer.write("            <artifactId>commons-lang3</artifactId>\n");
-            writer.write("            <version>3.7</version>\n");
-            writer.write("        </dependency>\n");
-
-            if (projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE) {
-                writer.write("        <dependency>\n");
-                writer.write("            <groupId>org.freemarker</groupId>\n");
-                writer.write("            <artifactId>freemarker</artifactId>\n");
-                writer.write("            <version>2.3.23</version>\n");
-                writer.write("            <scope>test</scope>\n");
-                writer.write("        </dependency>\n");
-            }
-
-            writer.write("        <dependency>\n");
-            writer.write("            <groupId>com.google.guava</groupId>\n");
-            writer.write("            <artifactId>guava</artifactId>\n");
-            writer.write("            <version>24.0-jre</version>\n");
-            writer.write("        </dependency>\n");
-
-            writer.write("    </dependencies>\n\n");
-
-            writer.write("    <build>\n");
-            writer.write("        <finalName>" + this.projectConfig.project + "</finalName>\n");
-            writer.write("        <plugins>\n");
-            writer.write("            <plugin>\n");
-            writer.write("                <groupId>org.springframework.boot</groupId>\n");
-            writer.write("                <artifactId>spring-boot-maven-plugin</artifactId>\n");
-            writer.write("                <configuration>\n");
-            writer.write("                    <fork>true</fork>\n");
-            writer.write("                    <mainClass>com." + this.projectConfig.company + "." + this.projectConfig.project + ".Application</mainClass>\n");
-            writer.write("                    <executable>true</executable>\n");
-            writer.write("                </configuration>\n");
-            writer.write("                <executions>\n");
-            writer.write("                    <execution>\n");
-            writer.write("                        <goals>\n");
-            writer.write("                            <goal>repackage</goal>\n");
-            writer.write("                        </goals>\n");
-            writer.write("                    </execution>\n");
-            writer.write("                </executions>\n");
-            writer.write("                <dependencies>\n");
-            writer.write("                    <dependency>\n");
-            writer.write("                        <groupId>org.springframework</groupId>\n");
-            writer.write("                        <artifactId>springloaded</artifactId>\n");
-            writer.write("                        <version>1.2.6.RELEASE</version>\n");
-            writer.write("                    </dependency>\n");
-            writer.write("                </dependencies>\n");
-            writer.write("            </plugin>\n");
-            writer.write("            <plugin>\n");
-            writer.write("                <groupId>org.apache.maven.plugins</groupId>\n");
-            writer.write("                <artifactId>maven-compiler-plugin</artifactId>\n");
-            writer.write("                <configuration>\n");
-            writer.write("                    <source>${java.version}</source>\n");
-            writer.write("                    <target>${java.version}</target>\n");
-            writer.write("                </configuration>\n");
-            writer.write("            </plugin>\n");
-
-            if (projectConfig.dataBaseConfig.getDataBaseType()!=DataBaseType.NONE&&projectConfig.dataBaseConfig.getOrmType()==OrmType.JPA) {
-                writer.write("            <plugin>\n");
-                writer.write("                <groupId>com.mysema.maven</groupId>\n");
-                writer.write("                <artifactId>apt-maven-plugin</artifactId>\n");
-                writer.write("                <version>1.1.3</version>\n");
-                writer.write("                <executions>\n");
-                writer.write("                    <execution>\n");
-                writer.write("                        <goals>\n");
-                writer.write("                            <goal>process</goal>\n");
-                writer.write("                        </goals>\n");
-                writer.write("                        <configuration>\n");
-                writer.write("                            <outputDirectory>target/generated-sources/java</outputDirectory>\n");
-                writer.write("                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>\n");
-                writer.write("                        </configuration>\n");
-                writer.write("                    </execution>\n");
-                writer.write("                </executions>\n");
-                writer.write("            </plugin>\n");
-            }
-
-            writer.write("        </plugins>\n");
-            writer.write("    </build>");
-
-            writer.write(POM_FOOTER);
-            writer.flush();
-
-            System.out.println("pom.xml 依赖引入完毕！");
+            cfg.getTemplate("pom.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
-            System.out.println("pom.xml 依赖引入失败！");
-            e.printStackTrace();
-            System.exit(0);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void modifyApplication() {
-        FileOutputStream outputStream = null;
-        PrintWriter writer = null;
-        try {
-            String yml = getRoot() + "/src/main/resources/application.yml";
-            File file = new File(yml);
-            outputStream = new FileOutputStream(file);
-            writer = new PrintWriter(outputStream);
-            writer.write("server: \n");
-            writer.write("  port: " + projectConfig.port + "\n");
-            writer.write("  servlet: \n");
-            writer.write("    context-path: /" + projectConfig.project + "\n\n");
-
-            writer.write("spring: \n");
-            writer.write("  application: \n");
-            writer.write("    name: " + projectConfig.project + "\n");
-            writer.write("  mvc: \n");
-            writer.write("    throw-exception-if-no-handler-found: true\n");
-            writer.write("  resources: \n");
-            writer.write("    add-mappings: false\n");
-            writer.write("  profiles: \n");
-            writer.write("    active: dev\n");
-
-            if (projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-                writer.write("  datasource: \n");
-                switch (projectConfig.dataBaseConfig.getDataBaseType()) {
-                    case MYSQL:
-                        writer.write("    driver-class-name: com.mysql.jdbc.Driver\n");
-                        break;
-                    case ORACLE:
-                        writer.write("    driver-class-name: oracle.jdbc.OracleDriver\n");
-                        break;
-                    case SQLSERVER:
-                        writer.write("    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver\n");
-                        break;
-
-                }
-                switch (projectConfig.dataBaseConfig.getDataBaseConnectPool()) {
-                    case DRUID:
-                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
-                        break;
-                    case HIKARICP:
-                        writer.write("    type: com.zaxxer.hikari.HikariDataSource\n");
-                        break;
-                    default:
-                        writer.write("    type: com.alibaba.druid.pool.DruidDataSource\n");
-                        break;
-
-                }
-
-                if (projectConfig.dataBaseConfig.getOrmType() == OrmType.JPA) {
-                    writer.write("  jpa: \n");
-                    writer.write("    show-sql: true\n");
-                    writer.write("    open-in-view: true\n");
-                    writer.write("    hibernate: \n");
-                    writer.write("      ddl-auto: none\n");
-                    writer.write("      naming: \n");
-                    writer.write("        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl\n");
-                    writer.write("    properties: \n");
-                    writer.write("      hibernate: \n");
-                    switch (projectConfig.dataBaseConfig.getDataBaseType()) {
-                        case MYSQL:
-                            writer.write("        dialect: org.hibernate.dialect.MySQLDialect\n");
-                            break;
-                        case ORACLE:
-                            writer.write("        dialect: org.hibernate.dialect.OracleDialect\n");
-                            break;
-                        case SQLSERVER:
-                            writer.write("        dialect: org.hibernate.dialect.SQLServer2012Dialect\n");
-                            break;
-
-                    }
-
-                }
-            }
-
-            writer.write("\n---\n");
-            writer.write("spring: \n");
-            writer.write("  profiles: dev\n");
-            if (projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-                writer.write("  datasource: \n");
-                writer.write("    url: " + projectConfig.dataBaseConfig.getJdbc_url() + "\n");
-                writer.write("    username: " + projectConfig.dataBaseConfig.getUser() + "\n");
-                writer.write("    password: " + projectConfig.dataBaseConfig.getPassword() + "\n");
-            }
-            writer.write("\n---\n");
-            writer.write("spring: \n");
-            writer.write("  profiles: test\n");
-            if (projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-                writer.write("  datasource: \n");
-                writer.write("    url: " + projectConfig.dataBaseConfig.getJdbc_url() + "\n");
-                writer.write("    username: " + projectConfig.dataBaseConfig.getUser() + "\n");
-                writer.write("    password: " + projectConfig.dataBaseConfig.getPassword() + "\n");
-            }
-            writer.write("\n---\n");
-            writer.write("spring: \n");
-            writer.write("  profiles: prod\n");
-            if (projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-                writer.write("  datasource: \n");
-                writer.write("    url: " + projectConfig.dataBaseConfig.getJdbc_url() + "\n");
-                writer.write("    username: " + projectConfig.dataBaseConfig.getUser() + "\n");
-                writer.write("    password: " + projectConfig.dataBaseConfig.getPassword() + "\n");
-            }
-            writer.flush();
-            System.out.println("application.yml 配置完毕！");
-        } catch (Exception e) {
-            System.out.println("application.yml 配置失败！");
-            e.printStackTrace();
-            System.exit(0);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void touchConfigFile() {
-        try {
-            String pom = getRoot() + "/pom.xml";
-            File file = new File(pom);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            String yml = getRoot() + "/src/main/resources/application.yml";
-            file = new File(yml);
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        } catch (Exception e) {
+            System.out.println("maven配置文件 pom.xml 生成失败！");
             e.printStackTrace();
             System.exit(0);
         }
-        System.out.println("项目配置文件创建完毕！");
+        System.out.println("maven配置文件 pom.xml 生成完毕！");
     }
+
+    private void createApplication() {
+        try {
+            freemarker.template.Configuration cfg = getConfiguration();
+            Map<String, Object> data = new HashMap<>();
+
+            data.put("port", this.projectConfig.company);
+            data.put("artifactId", this.projectConfig.project);
+            data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
+            data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());
+            data.put("ormType", this.projectConfig.dataBaseConfig.getOrmType().toString());
+            data.put("databaseConnectPool", this.projectConfig.dataBaseConfig.getDataBaseConnectPool().toString());
+
+            data.put("jdbcurl", this.projectConfig.dataBaseConfig.getJdbc_url());
+            data.put("username", this.projectConfig.dataBaseConfig.getUser());
+            data.put("password", this.projectConfig.dataBaseConfig.getPassword());
+
+            File file = new File(getRoot() + "/src/main/resources/application.yml");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("application.ftl").process(data, new FileWriter(file));
+        } catch (Exception e) {
+            System.out.println("配置文件 application.yml 生成失败！");
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.println("配置文件 application.yml 生成完毕！");
+    }
+
 
     private void touchDir() {
         String mainjava = getJavaPath();

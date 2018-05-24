@@ -1,7 +1,7 @@
 server:
   port: ${port}
   servlet:
-    context-path: ${artifactId}
+    context-path: /${artifactId}
 
 spring:
   application:

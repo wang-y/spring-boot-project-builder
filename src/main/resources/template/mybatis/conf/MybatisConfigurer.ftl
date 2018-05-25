@@ -25,6 +25,8 @@ import static ${corepackage}.constant.ProjectConstant.*;
 @Configuration
 public class MybatisConfigurer {
 
+    private static final String DATABASETYPE="${databasetype}";
+
     @Bean
     public SqlSessionFactory sqlSessionFactoryBean(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
@@ -78,7 +80,7 @@ public class MybatisConfigurer {
         Properties properties = new Properties();
         properties.setProperty("mappers", MAPPER_INTERFACE_REFERENCE);
         properties.setProperty("notEmpty", "false");//insert、update是否判断字符串类型!='' 即 test="str != null"表达式内是否追加 and str != ''
-        properties.setProperty("IDENTITY", "MYSQL");
+        properties.setProperty("IDENTITY", DATABASETYPE);
         mapperScannerConfigurer.setProperties(properties);
 
         return mapperScannerConfigurer;

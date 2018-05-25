@@ -113,7 +113,6 @@ public class CodeGenerator {
         if (StringUtils.equalsIgnoreCase(DATABASETYPE,"mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE,"sqlserver")){
             tableConfiguration.setGeneratedKey(new GeneratedKey("id", DATABASETYPE, true, null));
         }
-        tableConfiguration.setGeneratedKey(new GeneratedKey("id", DATABASETYPE, true, null));
         context.addTableConfiguration(tableConfiguration);
 
         List<String> warnings;

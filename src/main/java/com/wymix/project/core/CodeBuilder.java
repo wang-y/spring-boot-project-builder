@@ -154,6 +154,7 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
             data.put("confpackage", PACKAGE_CONF);
             data.put("corepackage", PACKAGE_CORE);
+            data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
 
             File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "MybatisConfigurer.java");
             if (!file.getParentFile().exists()) {

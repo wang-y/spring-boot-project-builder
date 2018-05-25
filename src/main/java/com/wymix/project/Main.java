@@ -13,7 +13,7 @@ public class Main {
                 .company("abcd")
                 .disableSwagger()
                 .setDataBaseType(DataBaseType.SQLSERVER)
-                .configure("jdbc:mysql://10.30.0.10:8066/oricmfuntest", "root", "ori18502800930")
+                .JDBCconfigure("jdbc:mysql://10.30.0.10:8066/oricmfuntest", "root", "ori18502800930")
                 .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
 

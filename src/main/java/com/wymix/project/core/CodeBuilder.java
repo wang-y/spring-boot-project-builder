@@ -4,6 +4,7 @@ import com.wymix.project.core.constant.DataBaseType;
 import com.wymix.project.core.constant.OrmType;
 import com.wymix.project.core.constant.VersionConstants;
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -81,6 +82,8 @@ public final class CodeBuilder {
         System.out.println("                                           (欢迎fork)");
 
         this.projectConfig = projectConfig;
+
+        checkConfig();
         String basepackage = "com." + projectConfig.company + "." + projectConfig.project;
 
         PACKAGE_CONF = basepackage + ".conf";
@@ -99,31 +102,52 @@ public final class CodeBuilder {
 
         switch (projectConfig.dataBaseConfig.getOrmType()) {
             case JPA:
-                copyCoreJPAJava();
-                copyConfJPAJava();
+                createJPACore();
+                createJPAConf();
                 genJPABusinessLogicCode();
                 break;
             case MYBATIS:
-                copyCoreMyBatisJava();
-                copyConfMyBatisJava();
+                createMyBatisCore();
+                createMyBatisConf();
                 break;
             default:
-                copyCoreJPAJava();
-                copyConfJPAJava();
+                createJPACore();
+                createJPAConf();
                 genJPABusinessLogicCode();
                 break;
         }
-        copyCoreCommonJava();
-        copyConfCommonJava();
+        createCommonCore();
+        createCommonConf();
         if (projectConfig.enable_swagger) {
-            copyConfSwaggerJava();
+            createSwaggerConf();
         }
-        copyCodeTemplate();
-        copyBanner();
+        createTemplateCode();
+        createBanner();
         System.out.println("项目创建完毕！");
     }
 
-    private void copyConfMyBatisJava() {
+    private void checkConfig() {
+        if(StringUtils.isBlank(projectConfig.company)){
+            throw new NullPointerException("company can not null!");
+        }
+        if(StringUtils.isBlank(projectConfig.project)){
+            throw new NullPointerException("project can not null!");
+        }
+
+        if(!projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE)){
+            if(StringUtils.isBlank(projectConfig.dataBaseConfig.getJdbc_url())){
+                throw new NullPointerException("JDBC URL can not null!");
+            }
+            if(StringUtils.isBlank(projectConfig.dataBaseConfig.getUser())){
+                throw new NullPointerException("JDBC USERNAME can not null!");
+            }
+            if(StringUtils.isBlank(projectConfig.dataBaseConfig.getPassword())){
+                throw new NullPointerException("JDBC PASSWORD can not null!");
+            }
+        }
+    }
+
+    private void createMyBatisConf() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -139,12 +163,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("MyBatis配置类生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("MyBatis配置类生成完毕！");
     }
 
-    private void copyCoreMyBatisJava() {
+    private void createMyBatisCore() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -178,12 +202,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("MyBatis核心库生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("MyBatis核心库生成完毕！");
     }
 
-    private void copyBanner() {
+    private void createBanner() {
         try {
             File file = new File(getResourcePath() + "banner.txt");
             if (!file.getParentFile().exists()) {
@@ -198,12 +222,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("banner生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("banner生成完毕！");
     }
 
-    private void copyCodeTemplate() {
+    private void createTemplateCode() {
         String jdbc_driver = "";
         if (projectConfig.dataBaseConfig != null && projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
             switch (projectConfig.dataBaseConfig.getDataBaseType()) {
@@ -317,12 +341,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("代码生成器类创建失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("代码生成器类创建完毕！");
     }
 
-    private void copyConfSwaggerJava() {
+    private void createSwaggerConf() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -338,7 +362,7 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("swagger配置类生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("swagger配置类生成完毕！");
     }
@@ -367,7 +391,7 @@ public final class CodeBuilder {
         System.out.println("JPA业务包创建完毕！");
     }
 
-    private void copyCoreCommonJava() {
+    private void createCommonCore() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -412,12 +436,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("通用核心库生成完毕！");
     }
 
-    private void copyConfCommonJava() {
+    private void createCommonConf() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
             Map<String, Object> data = new HashMap<>();
@@ -432,12 +456,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("通用配置类生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("通用配置类生成完毕！");
     }
 
-    private void copyConfJPAJava() {
+    private void createJPAConf() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
             Map<String, Object> data = new HashMap<>();
@@ -451,12 +475,12 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("JPA配置类生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("JPA配置类生成完毕！");
     }
 
-    private void copyCoreJPAJava() {
+    private void createJPACore() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -536,7 +560,7 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("JPA核心包生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("JPA核心包生成完毕！");
     }
@@ -554,7 +578,7 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("启动类 Application.java 生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("启动类 Application.java 生成完毕！");
     }
@@ -587,7 +611,7 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("maven配置文件 pom.xml 生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("maven配置文件 pom.xml 生成完毕！");
     }
@@ -616,7 +640,7 @@ public final class CodeBuilder {
         } catch (Exception e) {
             System.out.println("配置文件 application.yml 生成失败！");
             e.printStackTrace();
-            System.exit(0);
+            deleteProject();
         }
         System.out.println("配置文件 application.yml 生成完毕！");
     }
@@ -649,6 +673,11 @@ public final class CodeBuilder {
             file.mkdirs();
         }
         System.out.println("项目目录创建完毕！");
+    }
 
+    private void deleteProject() {
+        File file = new File(getRoot());
+        file.deleteOnExit();
+        System.exit(0);
     }
 }

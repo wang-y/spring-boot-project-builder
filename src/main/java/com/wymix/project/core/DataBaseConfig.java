@@ -24,9 +24,9 @@ public class DataBaseConfig {
         this.dataBaseConnectPool = DataBaseConnectPool.NONE;
     }
 
-    public ProjectConfig configure(String jdbc_url, String user, String password) {
-        this.jdbc_url = jdbc_url;
-        this.user = user;
+    public ProjectConfig JDBCconfigure(String url, String username, String password) {
+        this.jdbc_url = url;
+        this.user = username;
         this.password = password;
         return this.projectConfig;
     }

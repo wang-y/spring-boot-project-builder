@@ -637,7 +637,7 @@ public final class CodeBuilder {
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("application.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("application_yml.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("配置文件 application.yml 生成失败！");
             e.printStackTrace();

@@ -622,7 +622,7 @@ public final class CodeBuilder {
             freemarker.template.Configuration cfg = getConfiguration();
             Map<String, Object> data = new HashMap<>();
 
-            data.put("port", this.projectConfig.port);
+            data.put("port", ""+this.projectConfig.port);
             data.put("artifactId", this.projectConfig.project);
             data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
             data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());

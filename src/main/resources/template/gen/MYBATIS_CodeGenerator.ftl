@@ -110,7 +110,9 @@ public class CodeGenerator {
         tableConfiguration.setTableName(tableName);
         if (StringUtils.isNotEmpty(modelName))
             tableConfiguration.setDomainObjectName(modelName);
-        if (StringUtils.equalsIgnoreCase(DATABASETYPE,"mysql")||StringUtils.equalsIgnoreCase(DATABASETYPE,"sqlserver")){
+        if (StringUtils.equalsIgnoreCase(DATABASETYPE,"oracle")){
+            tableConfiguration.setGeneratedKey(new GeneratedKey("id", "select SEQ_{0}.nextval from dual", false, "pre"));
+        }else{
             tableConfiguration.setGeneratedKey(new GeneratedKey("id", DATABASETYPE, true, null));
         }
         context.addTableConfiguration(tableConfiguration);

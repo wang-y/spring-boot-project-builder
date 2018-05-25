@@ -80,7 +80,12 @@ public class MybatisConfigurer {
         Properties properties = new Properties();
         properties.setProperty("mappers", MAPPER_INTERFACE_REFERENCE);
         properties.setProperty("notEmpty", "false");//insert、update是否判断字符串类型!='' 即 test="str != null"表达式内是否追加 and str != ''
-        properties.setProperty("IDENTITY", DATABASETYPE);
+        if(StringUtils.equalsIgnoreCase(DATABASETYPE,"oracle")){
+            properties.setProperty("ORDER","BEFORE");
+            properties.setProperty("IDENTITY", "select SEQ_ID.nextval from dual");
+        }else {
+            properties.setProperty("IDENTITY", DATABASETYPE);
+        }
         mapperScannerConfigurer.setProperties(properties);
 
         return mapperScannerConfigurer;

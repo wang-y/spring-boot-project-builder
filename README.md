@@ -10,7 +10,7 @@ public class Main {
                 .company("wymix")  //公司名
                 .enableSwagger()  //启用swagger
                 .setDataBaseType(DataBaseType.MYSQL)  //指定数据库类型（目前支持mysql/oracle/sqlserver）
-                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "ori18502800930") //配置数据库
+                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "12345678") //配置数据库
                 .setOrmType(OrmType.JPA) //指定持久层框架(目前支持JPA/MyBatis)
                 .setDataBaseConnectPool(DataBaseConnectPool.DRUID);//指定数据库连接池(目前支持DRUID/HIKARICP)
 

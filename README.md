@@ -46,6 +46,8 @@ public static void main(String[] args) {
 
 # 使用MyBatis
 
+**本模块代码复制自 https://github.com/lihengming/spring-boot-api-project-seed 版权归他 ^_^**
+
 在生成的代码中
 
 src/test/java/com/company/project/CodeGenerator

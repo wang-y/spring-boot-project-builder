@@ -40,8 +40,31 @@ public class MybatisConfigurer {
 
         //添加XML目录
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        factory.setMapperLocations(resolver.getResources("classpath:mapper/*.xml"));
+	org.springframework.core.io.Resource[] resources = null;
+	if (!ObjectUtils.isEmpty(resources = resolveMapperLocations("classpath:mapper/**/*.xml"))) {
+            factory.setMapperLocations(resources);
+        }
         return factory.getObject();
+    }
+
+    public org.springframework.core.io.Resource[] resolveMapperLocations(String... mapperLocations) {
+
+        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+        ArrayList resources = new ArrayList();
+        if(mapperLocations != null) {
+            int total = mapperLocations.length;
+
+            for(int i = 0; i < total; ++i) {
+                String mapperLocation = mapperLocations[i];
+                try {
+                    org.springframework.core.io.Resource[] mappers = resourceResolver.getResources(mapperLocation);
+                    resources.addAll(Arrays.asList(mappers));
+                } catch (IOException ex) {
+                }
+            }
+        }
+
+        return (org.springframework.core.io.Resource[])resources.toArray(new org.springframework.core.io.Resource[resources.size()]);
     }
 
     @Bean

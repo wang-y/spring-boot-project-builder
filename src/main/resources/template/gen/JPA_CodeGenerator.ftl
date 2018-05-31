@@ -173,7 +173,8 @@ public class CodeGenerator {
     private static String buildEntity(List<ColumnInfo> columnInfos, String tableName, String modelname, boolean f_util, boolean f_sql) {
         StringBuffer sb = new StringBuffer();
         sb.append("package ${basepackage}.business.model;\r\n\r\n");
-        sb.append("import lombok.Data;\r\n\n");
+        sb.append("import lombok.Getter;\r\n");
+        sb.append("import lombok.Setter;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         sb.append("import javax.persistence.*;\r\n");
         // 判断是否导入工具包
@@ -190,7 +191,8 @@ public class CodeGenerator {
 
         sb.append(" */\r\n");
         // 实体部分
-        sb.append("\r\n@Data");
+        sb.append("\r\n@Getter");
+        sb.append("\r\n@Setter");
         sb.append("\r\n@Entity");
         sb.append("\r\n@Table(name = \"" + tableName + "\")");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(StringUtils.isNotBlank(modelname) ? modelname : tableName) + " implements Serializable {\r\n\r\n");

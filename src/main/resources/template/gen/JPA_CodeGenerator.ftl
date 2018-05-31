@@ -53,16 +53,18 @@ public class CodeGenerator {
             String sql="";
 
             if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")) {
+                con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
+                      JDBC_USERNAME, JDBC_PASSWORD);
+
                 String cleanURI = JDBC_URL.substring(5);
                 URI uri = URI.create(cleanURI);
                 String host=uri.getHost();
                 String port=String.valueOf(uri.getPort());
                 String database=uri.getPath().replaceFirst("/", "");
-                con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
-                      JDBC_USERNAME, JDBC_PASSWORD);
                 sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA,NUMERIC_PRECISION,NUMERIC_SCALE from COLUMNS where TABLE_SCHEMA='" + database + "' and TABLE_NAME=?";
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {
                 con = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+
                 sql += "SELECT CAST(col.name AS NVARCHAR(1000)) AS COLUMN_NAME ,\n" +
                         "CAST(ISNULL(ep.[value], '') AS NVARCHAR(1000)) AS COLUMN_COMMENT ,\n" +
                         "CAST(t.name AS NVARCHAR(128)) AS DATA_TYPE ,\n" +
@@ -84,7 +86,6 @@ public class CodeGenerator {
                         "LEFT  JOIN sys.extended_properties epTwo ON obj.id = epTwo.major_id AND epTwo.minor_id = 0 AND epTwo.name = 'MS_Description'\n" +
                         "WHERE obj.name = ? \n";
             }
-
 
             pStemt = con.prepareStatement(sql);
             pStemt.setString(1, tableName);

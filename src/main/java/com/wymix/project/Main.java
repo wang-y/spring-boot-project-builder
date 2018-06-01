@@ -13,7 +13,25 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+//        buildProject();
+        build();
+    }
 
+
+    private static void buildProject() {
+        ProjectConfig projectConfig = ProjectConfig.project("test")
+                .company("wymix")
+                .enableSwagger()
+                .setDataBaseType(DataBaseType.SQLSERVER)
+                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf", "root", "12345678")
+                .setOrmType(OrmType.JPA)
+                .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
+
+        CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);
+    }
+
+
+    private static void build() {
         System.out.println("               _");
         System.out.println("         __  _(_) ___ __ _ _   ___      __");
         System.out.println("         \\ \\/ / |/ _ ' _` | | | \\ \\ /\\ / /");
@@ -77,7 +95,7 @@ public class Main {
             System.out.println("项目 [" + project + "] 数据库采用 [" + dataTpe.toString() + "]。\n");
         }
 
-        if (!dataTpe.equals(DataBaseType.NONE)){
+        if (!dataTpe.equals(DataBaseType.NONE)) {
 
             System.out.print("请输入数据库JDBC连接地址：");
             String jdbc_url = scanner.nextLine();
@@ -123,22 +141,9 @@ public class Main {
             System.out.println("项目 [" + project + "] 数据库连接池采用 [" + dataBaseConnectPool.toString() + "]。\n");
         }
 
-        System.out.println("开始构建 ["+project+"] 项目...");
+        System.out.println("开始构建 [" + project + "] 项目...");
         CodeBuilder.toFilePath(path).build(projectConfig);
-        System.out.println("构建 ["+project+"] 项目完毕！");
-        System.out.println("请前往目录 ["+path+"] 下查看项目！");
+        System.out.println("构建 [" + project + "] 项目完毕！");
+        System.out.println("请前往目录 [" + path + "] 下查看项目！");
     }
-
-
-//    public static void buildProject() {
-//        ProjectConfig projectConfig = ProjectConfig.project("test")
-//                .company("wymix")
-//                .enableSwagger()
-//                .setDataBaseType(DataBaseType.SQLSERVER)
-//                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf", "root", "12345678")
-//                .setOrmType(OrmType.JPA)
-//                .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
-//
-//        CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);
-//    }
 }

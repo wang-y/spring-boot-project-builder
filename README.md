@@ -3,12 +3,12 @@
 快速构建Spring Boot项目
 
 下载 release 版本：
+
 https://github.com/wang-y/spring-boot-project-builder/releases/download/1.0.0/spring-boot-project-builder.jar
 
 下载完成后 运行命令
 ```
 # java -jar spring-boot-project-builder.jar
-
 ```
 根据引导一步步输入信息即可快速生成 spring boot 项目代码
 

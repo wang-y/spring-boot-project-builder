@@ -53,13 +53,14 @@ public class CodeGenerator {
             String sql="";
 
             if (StringUtils.equalsIgnoreCase(DATABASETYPE, "mysql")) {
-                con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
-                      JDBC_USERNAME, JDBC_PASSWORD);
-
                 String cleanURI = JDBC_URL.substring(5);
                 URI uri = URI.create(cleanURI);
                 String host=uri.getHost();
                 String port=String.valueOf(uri.getPort());
+                
+                con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
+                      JDBC_USERNAME, JDBC_PASSWORD);
+
                 String database=uri.getPath().replaceFirst("/", "");
                 sql += "select COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT,COLUMN_KEY,EXTRA,NUMERIC_PRECISION,NUMERIC_SCALE from COLUMNS where TABLE_SCHEMA='" + database + "' and TABLE_NAME=?";
             } else if (StringUtils.equalsIgnoreCase(DATABASETYPE, "sqlserver")) {

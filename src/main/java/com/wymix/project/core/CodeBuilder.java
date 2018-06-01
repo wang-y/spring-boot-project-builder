@@ -70,17 +70,6 @@ public final class CodeBuilder {
     }
 
     public void build(ProjectConfig projectConfig) {
-        System.out.println("               _");
-        System.out.println("         __  _(_) ___ __ _ _   ___      __");
-        System.out.println("         \\ \\/ / |/ _ ' _` | | | \\ \\ /\\ / /");
-        System.out.println("          >  <| | | | | | | |_| |\\ V  V /");
-        System.out.println("         /_/\\_\\_|_| |_| |_| .__/  \\_/\\_/");
-        System.out.println("                           \\___|");
-        System.out.println("-----------------------------------------------------");
-        System.out.println("https://github.com/wang-y/spring-boot-project-builder");
-        System.out.println("-----------------------------------------------------");
-        System.out.println("                                           (欢迎fork)");
-
         this.projectConfig = projectConfig;
 
         checkConfig();

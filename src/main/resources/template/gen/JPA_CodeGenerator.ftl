@@ -57,7 +57,7 @@ public class CodeGenerator {
                 URI uri = URI.create(cleanURI);
                 String host=uri.getHost();
                 String port=String.valueOf(uri.getPort());
-                
+
                 con = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/INFORMATION_SCHEMA?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
                       JDBC_USERNAME, JDBC_PASSWORD);
 

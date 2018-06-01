@@ -2,26 +2,15 @@
 
 快速构建Spring Boot项目
 
-```java
-public class Main {
+下载 release 版本：
+https://github.com/wang-y/spring-boot-project-builder/releases/download/1.0.0/spring-boot-project-builder.jar
 
-    public static void main(String[] args) {
-        ProjectConfig projectConfig = ProjectConfig.project("demo")  //项目名
-                .company("wymix")  //公司名
-                .enableSwagger()  //启用swagger
-                .setDataBaseType(DataBaseType.MYSQL)  //指定数据库类型（目前支持mysql/sqlserver）
-                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf?zeroDateTimeBehavior=convertToNull&autoReconnect=true", "root", "12345678") //配置数据库
-                .setOrmType(OrmType.JPA) //指定持久层框架(目前支持JPA/MyBatis)
-                .setDataBaseConnectPool(DataBaseConnectPool.DRUID);//指定数据库连接池(目前支持DRUID/HIKARICP)
-
-        //向"/home/wymix/workspaces/study_diary_workspaces/"输出项目文件
-        CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces/").build(projectConfig);
-
-    }
-}
+下载完成后 运行命令
 ```
+# java -jar spring-boot-project-builder.jar
 
-一键生成 spring boot 项目代码
+```
+根据引导一步步输入信息即可快速生成 spring boot 项目代码
 
 **本项目在mysql/sqlserver环境下测试均通过！**
 

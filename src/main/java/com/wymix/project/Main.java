@@ -47,16 +47,57 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String path = scanner.nextLine();
         System.out.println("项目将创建到 [" + path + "] 路径下。\n");
-
-        System.out.print("请输入个人/企业英文名称或缩写：");
-        String company = scanner.nextLine();
+        String company ="wymix";
+        System.out.print("请输入个人/企业英文名称或缩写（小写）：");
+        while (true){
+            company = scanner.nextLine();
+            if(company.matches("^[a-z]+$")){
+                break;
+            }else{
+                System.out.println("输入错误，请重新输入");
+                System.out.print("请输入个人/企业英文名称或缩写（小写）：");
+            }
+        }
         System.out.println("项目名称为： [" + company + "] 。\n");
 
         System.out.print("请输入项目英文名称或缩写：");
-        String project = scanner.nextLine();
+        String project = "test";
+        while (true){
+            project = scanner.nextLine();
+            if(project.matches("^[a-z]+$")){
+                break;
+            }else{
+                System.out.println("输入错误，请重新输入");
+                System.out.print("请输入项目英文名称或缩写：");
+            }
+        }
         System.out.println("项目名称为： [" + project + "] 。\n");
 
         ProjectConfig projectConfig = ProjectConfig.project(project).company(company).enableSwagger();
+
+        System.out.print("请输入项目占用端口(默认:8080)：");
+        String port = "";
+        while (true){
+            port = scanner.nextLine();
+            if(StringUtils.isBlank(port)){
+                break;
+            }
+            if(port.matches("^[0-9]\\d*$")){
+                if(Integer.parseInt(port)>=0&&Integer.parseInt(port)<=65535){
+                    break;
+                }else{
+                    System.out.println("端口号范围: [ 0 - 65535 ] ");
+                    System.out.print("请输入项目占用端口(默认:8080)：");
+                }
+            }else{
+                System.out.println("输入错误，请重新输入");
+                System.out.print("请输入项目占用端口(默认:8080)：");
+            }
+        }
+        if(StringUtils.isNotBlank(port)){
+            projectConfig.setPort(Integer.parseInt(port));
+        }
+        System.out.println("项目占用端口为： [" + projectConfig.getPort() + "] 。\n");
 
         System.out.println("是否启用Swagger2：");
         System.out.println("    0. 禁用");

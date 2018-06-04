@@ -66,4 +66,7 @@ public class ProjectConfig {
         return this;
     }
 
+    public int getPort() {
+        return this.port;
+    }
 }

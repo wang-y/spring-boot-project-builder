@@ -13,6 +13,16 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        System.out.println("               _");
+        System.out.println("         __  _(_) ___ __ _ _   ___      __");
+        System.out.println("         \\ \\/ / |/ _ ' _` | | | \\ \\ /\\ / /");
+        System.out.println("          >  <| | | | | | | |_| |\\ V  V /");
+        System.out.println("         /_/\\_\\_|_| |_| |_| .__/  \\_/\\_/");
+        System.out.println("                           \\___|");
+        System.out.println("-----------------------------------------------------");
+        System.out.println("https://github.com/wang-y/spring-boot-project-builder");
+        System.out.println("-----------------------------------------------------");
+        System.out.println("                                           (欢迎fork)");
 //        buildProject();
         build();
     }
@@ -32,17 +42,6 @@ public class Main {
 
 
     private static void build() {
-        System.out.println("               _");
-        System.out.println("         __  _(_) ___ __ _ _   ___      __");
-        System.out.println("         \\ \\/ / |/ _ ' _` | | | \\ \\ /\\ / /");
-        System.out.println("          >  <| | | | | | | |_| |\\ V  V /");
-        System.out.println("         /_/\\_\\_|_| |_| |_| .__/  \\_/\\_/");
-        System.out.println("                           \\___|");
-        System.out.println("-----------------------------------------------------");
-        System.out.println("https://github.com/wang-y/spring-boot-project-builder");
-        System.out.println("-----------------------------------------------------");
-        System.out.println("                                           (欢迎fork)");
-
         System.out.print("请输入项目创建路径：");
         Scanner scanner = new Scanner(System.in);
         String path = scanner.nextLine();

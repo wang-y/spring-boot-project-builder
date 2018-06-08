@@ -441,6 +441,12 @@ public final class CodeBuilder {
                 file.getParentFile().mkdirs();
             }
             cfg.getTemplate("common/conf/CustomWebMvcConfigurer.ftl").process(data, new FileWriter(file));
+
+            file = new File(getResourcePath()+ "static/home.html");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("home.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("通用配置类生成失败！");
             e.printStackTrace();

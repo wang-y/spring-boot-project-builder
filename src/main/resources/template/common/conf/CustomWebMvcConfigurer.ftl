@@ -17,10 +17,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
-<#if enabledSwagger>
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-</#if>
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.ServletException;
@@ -102,20 +100,26 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
         return filterRegistrationBean;
     }
 
-    <#if enabledSwagger>
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addRedirectViewController("/", "/home.html");
+    <#if enabledSwagger>
         registry.addRedirectViewController("/v2/api-docs", "/v2/api-docs");
         registry.addRedirectViewController("/swagger-resources/configuration/ui","/swagger-resources/configuration/ui");
         registry.addRedirectViewController("/swagger-resources/configuration/security","/swagger-resources/configuration/security");
         registry.addRedirectViewController("/swagger-resources", "/swagger-resources");
+    </#if>
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**.html").addResourceLocations("classpath:/static/");
+    <#if enabledSwagger>
         registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
     </#if>
+    }
+
 
 }

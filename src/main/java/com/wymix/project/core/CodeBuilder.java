@@ -384,6 +384,7 @@ public final class CodeBuilder {
 
             Map<String, Object> data = new HashMap<>();
             data.put("corepackage", PACKAGE_CORE);
+            data.put("enabledSwagger", projectConfig.enable_swagger);
 
             File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/Result.java");
             if (!file.getParentFile().exists()) {

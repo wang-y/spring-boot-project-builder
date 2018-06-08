@@ -13,17 +13,17 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-//        buildProject();
-        build();
+        buildProject();
+//        build();
     }
 
 
     private static void buildProject() {
-        ProjectConfig projectConfig = ProjectConfig.project("test")
+        ProjectConfig projectConfig = ProjectConfig.project("testRestfulAPI")
                 .company("wymix")
                 .enableSwagger()
-                .setDataBaseType(DataBaseType.SQLSERVER)
-                .JDBCconfigure("jdbc:mysql://192.168.1.11:3306/testf", "root", "12345678")
+                .setDataBaseType(DataBaseType.MYSQL)
+                .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
                 .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
 

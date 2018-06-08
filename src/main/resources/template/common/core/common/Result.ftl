@@ -1,13 +1,28 @@
 package ${corepackage}.common;
 
 import com.alibaba.fastjson.JSON;
+<#if enabledSwagger>
+import io.swagger.annotations.ApiModelProperty;
+</#if>
 
 /**
  * 统一API响应结果封装
  */
 public class Result<T> {
+
+    <#if enabledSwagger>
+    @ApiModelProperty(value = "应答码")
+    </#if>
     private int code;
+
+    <#if enabledSwagger>
+    @ApiModelProperty(value = "应答信息")
+    </#if>
     private String message;
+
+    <#if enabledSwagger>
+    @ApiModelProperty(value = "请求返回值")
+    </#if>
     private T data;
 
     public Result() {

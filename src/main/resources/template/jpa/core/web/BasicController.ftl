@@ -20,71 +20,71 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
 
     protected abstract IBasicService<V, E, ID> getService();
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "详情", notes = "根据主键查询详情")
-    </#if>
-    @GetMapping(value = "getOne")
-    public Result<V> getOne(<#if enabledSwagger>@ApiParam(required = true, value = "主键") </#if>@RequestParam(required = true) ID id) {
+</#if>
+    @GetMapping(value = "/{id}")
+    public Result<V> getOne(@ApiParam(required = true, value = "主键") @PathVariable ID id) {
         return ResultGenerator.genSuccessResult(getService().findOne(id));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "详情", notes = "根据条件查询详情")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
-    </#if>
-    @PostMapping(value = "findOne")
-    public Result<V> findOne(@RequestBody PostRequest request) {
+</#if>
+    @PostMapping(value = "find")
+    public Result<V> find(@ApiParam @RequestBody PostRequest request) {
         return ResultGenerator.genSuccessResult(getService().findOne(request.getQueryParams()));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "列表", notes = "根据条件查询分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PageRequest", paramType = "body")
-    </#if>
+</#if>
     @PostMapping(value = "page")
     public Result<SimplePage<V>> page(@RequestBody PageRequest request) {
         return ResultGenerator.genSuccessResult(getService().page(request.getQueryParams(), request.getOrderBy(), request.getPage(), request.getSize()));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "列表", notes = "根据条件查询不分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
-    </#if>
+</#if>
     @PostMapping(value = "list")
     public Result<Collection<V>> list(@RequestBody PostRequest request) {
         return ResultGenerator.genSuccessResult(getService().list(request.getQueryParams(), request.getOrderBy()));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "新增", notes = "添加新数据")
-    </#if>
-    @PostMapping(value = "add")
+</#if>
+    @PostMapping
     public Result<V> add(@RequestBody V v) {
         return ResultGenerator.genSuccessResult(getService().save(v));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "修改", notes = "修改数据")
-    </#if>
-    @PostMapping(value = "modify")
+</#if>
+    @PutMapping
     public Result<V> modify(@RequestBody V v) {
         return ResultGenerator.genSuccessResult(getService().update(v));
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "删除", notes = "根据主键删除数据")
-    </#if>
-    @GetMapping(value = "delOne")
-    public Result<Void> delOne(<#if enabledSwagger>@ApiParam(required = true, value = "主键") </#if>@RequestParam ID id) {
+</#if>
+    @DeleteMapping(value = "/{id}")
+    public Result<Void> del(@ApiParam(required = true, value = "主键") @PathVariable ID id) {
         getService().delByID(id);
         return ResultGenerator.genSuccessResult();
     }
 
-    <#if enabledSwagger>
+<#if enabledSwagger>
     @ApiOperation(value = "删除", notes = "根据主键集合批量删除数据")
-    </#if>
-    @GetMapping(value = "del")
-    public Result<Void> del(<#if enabledSwagger>@ApiParam(required = true, value = "主键集合") </#if>@RequestParam Collection<ID> ids) {
+</#if>
+    @DeleteMapping
+    public Result<Void> del(@ApiParam(required = true, value = "主键集合") @RequestParam Collection<ID> ids) {
         getService().delBatchByID(ids);
         return ResultGenerator.genSuccessResult();
     }

@@ -505,12 +505,6 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("jpa/core/repo/factory/JpaRepositoryFactoryBean.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "utils/ReflectUtil.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/utils/ReflectUtil.ftl").process(data, new FileWriter(file));
-
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "page/PageInfo.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

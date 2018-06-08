@@ -2,7 +2,6 @@ package ${corepackage}.repo.impl;
 
 import ${corepackage}.page.PageInfo;
 import ${corepackage}.page.SimplePage;
-import ${corepackage}.utils.ReflectUtil;
 import ${corepackage}.repo.IBasicRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.query.NativeQuery;
@@ -18,9 +17,12 @@ import org.springframework.util.Assert;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.*;
+
+import static org.springframework.beans.BeanUtils.getPropertyDescriptor;
 
 public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepository<T, ID>
         implements IBasicRepository<T, ID> {
@@ -210,7 +212,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                 }
 
                 for (String str : tempKeys) {
-                    Class<?> clazz = ReflectUtil.getFieldType(this.getDomainClass(), replaceAllSuffix(str));
+                    Class<?> clazz = getFieldType(this.getDomainClass(), replaceAllSuffix(str));
                     if (clazz != null && clazz.equals(String.class) && !StringUtils.endsWithAny(str, "_in", "_notin")
                             && StringUtils.endsWithAny(str, "_like", "_notlike")) {
                         if (valueMap != null) {
@@ -424,7 +426,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str))
                                 .append(" not like :").append(str);
                     } else {
-                        Class<?> clazz = ReflectUtil.getFieldType(this.getDomainClass(), key);
+                        Class<?> clazz = getFieldType(this.getDomainClass(), key);
                         if (clazz != null && clazz.equals(String.class)) {
                             whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str))
                                     .append(" like :").append(str);
@@ -559,6 +561,13 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
         }
 
         return t;
+    }
+
+    private static Class<?> getFieldType(Class<?> entityClass, String fieldName) {
+        Assert.notNull(entityClass, "entityClass must not be null");
+        Assert.notNull(fieldName, "fieldName must not be null");
+        PropertyDescriptor pd = getPropertyDescriptor(entityClass, fieldName);
+        return pd.getPropertyType();
     }
 
 }

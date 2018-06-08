@@ -442,6 +442,12 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/conf/CustomWebMvcConfigurer.ftl").process(data, new FileWriter(file));
 
+            file = new File(getJavaPath() + PACKAGE_PATH_CONF + "OpenBrowseCommandRunner.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/conf/OpenBrowseCommandRunner.ftl").process(data, new FileWriter(file));
+
             file = new File(getResourcePath()+ "static/home.html");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

@@ -38,7 +38,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     }
 
 <#if enabledSwagger>
-    @ApiOperation(value = "列表", notes = "根据条件查询分页列表")
+    @ApiOperation(value = "分页列表", notes = "根据条件查询分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PageRequest", paramType = "body")
 </#if>
     @PostMapping(value = "page")
@@ -47,7 +47,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
     }
 
 <#if enabledSwagger>
-    @ApiOperation(value = "列表", notes = "根据条件查询不分页列表")
+    @ApiOperation(value = "列表", notes = "根据条件查询列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
 </#if>
     @PostMapping(value = "list")

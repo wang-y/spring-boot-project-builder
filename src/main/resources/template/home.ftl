@@ -6,7 +6,7 @@
     <meta name="Author" content="uniquejing">
     <meta name="Keywords" content="">
     <meta name="Description" content="">
-    <title>Document</title>
+    <title>欢迎使用</title>
 </head>
 <style>
     body {

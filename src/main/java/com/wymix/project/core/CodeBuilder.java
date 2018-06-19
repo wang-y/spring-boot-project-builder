@@ -286,6 +286,7 @@ public final class CodeBuilder {
                 data.put("basePackage", BASE_PACKAGE);
                 data.put("modelNameUpperCamel", "${modelNameUpperCamel}");
                 data.put("modelNameLowerCamel", "${modelNameLowerCamel}");
+                data.put("IDType", "${IDType}");
                 data.put("enabledSwagger", projectConfig.enable_swagger);
                 data.put("baseRequestMapping", "${baseRequestMapping}");
 
@@ -386,41 +387,144 @@ public final class CodeBuilder {
             data.put("corepackage", PACKAGE_CORE);
             data.put("enabledSwagger", projectConfig.enable_swagger);
 
-            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/Result.java");
+            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PageRequest.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/Result.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/body/PageRequest.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/ResultCode.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PostRequest.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/ResultCode.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/body/PostRequest.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/PostRequest.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BaseGlobalExceptionHandler.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/PostRequest.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/exception/BaseGlobalExceptionHandler.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/PageRequest.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BusinessException.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/PageRequest.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/exception/BusinessException.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/ServiceException.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ConvertUtil.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/ServiceException.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/exception/ConvertUtil.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/ResultGenerator.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataConflictException.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/core/common/ResultGenerator.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/core/common/exception/DataConflictException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataNotFoundException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/DataNotFoundException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ExceptionEnum.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/ExceptionEnum.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/GlobalExceptionHandler.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/GlobalExceptionHandler.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/InternalServerException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/InternalServerException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ParameterInvalidException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/ParameterInvalidException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/PermissionForbiddenException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/PermissionForbiddenException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/RemoteAccessException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/RemoteAccessException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/UserNotLoginException.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/exception/UserNotLoginException.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/interceptor/ResponseResultInterceptor.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/interceptor/ResponseResultInterceptor.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/DefaultErrorResult.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/DefaultErrorResult.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ParameterInvalidItem.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/ParameterInvalidItem.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/PlatformResult.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/PlatformResult.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResult.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/ResponseResult.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResultHandler.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/ResponseResultHandler.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/Result.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/Result.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResultCode.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/result/ResultCode.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/RequestContextHolderUtil.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/RequestContextHolderUtil.ftl").process(data, new FileWriter(file));
+
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();

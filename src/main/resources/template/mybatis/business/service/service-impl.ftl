@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Service
 @Transactional
-public class ${modelNameUpperCamel}ServiceImpl extends AbstractService<${modelNameUpperCamel}> implements ${modelNameUpperCamel}Service {
+public class ${modelNameUpperCamel}ServiceImpl extends AbstractService<${modelNameUpperCamel},${IDType}> implements ${modelNameUpperCamel}Service {
     @Resource
     private ${modelNameUpperCamel}Mapper ${modelNameLowerCamel}Mapper;
 

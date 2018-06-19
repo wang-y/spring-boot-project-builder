@@ -43,19 +43,17 @@ public class CodeGenerator {
     <#--private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";-->
 
     public static void main(String[] args) {
-        genCode("test_table");
+        genCode("test_table","Long");
         //genCodeByCustomModelName("输入表名","输入自定义Model名称");
     }
 
     /**
      * 通过数据表名称生成代码，Model 名称通过解析数据表名称获得，下划线转大驼峰的形式。
      * 如输入表名称 "t_user_detail" 将生成 TUserDetail、TUserDetailMapper、TUserDetailService ...
-     * @param tableNames 数据表名称...
+     * @param tableName 数据表名称...
      */
-    public static void genCode(String... tableNames) {
-        for (String tableName : tableNames) {
-            genCodeByCustomModelName(tableName, null);
-        }
+    public static void genCode(String tableName,String IDType) {
+       genCodeByCustomModelName(tableName, null,IDType);
     }
 
     /**
@@ -64,10 +62,10 @@ public class CodeGenerator {
      * @param tableName 数据表名称
      * @param modelName 自定义的 Model 名称
      */
-    public static void genCodeByCustomModelName(String tableName, String modelName) {
+    public static void genCodeByCustomModelName(String tableName, String modelName,String IDType) {
         genModelAndMapper(tableName, modelName);
-        genService(tableName, modelName);
-        genController(tableName, modelName);
+        genService(tableName, modelName,IDType);
+        genController(tableName, modelName,IDType);
     }
 
 
@@ -138,7 +136,7 @@ public class CodeGenerator {
         System.out.println(modelName + "Mapper.xml 生成成功");
     }
 
-    public static void genService(String tableName, String modelName) {
+    public static void genService(String tableName, String modelName,String IDType) {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -147,6 +145,7 @@ public class CodeGenerator {
             data.put("modelNameUpperCamel", modelNameUpperCamel);
             data.put("modelNameLowerCamel", tableNameConvertLowerCamel(tableName));
             data.put("basePackage", BASE_PACKAGE);
+            data.put("IDType", IDType);
 
             File file = new File(PROJECT_PATH + JAVA_PATH + PACKAGE_PATH_SERVICE + modelNameUpperCamel + "Service.java");
             if (!file.getParentFile().exists()) {
@@ -168,7 +167,7 @@ public class CodeGenerator {
         }
     }
 
-    public static void genController(String tableName, String modelName) {
+    public static void genController(String tableName, String modelName,String IDType) {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
 
@@ -178,6 +177,7 @@ public class CodeGenerator {
             data.put("modelNameUpperCamel", modelNameUpperCamel);
             data.put("modelNameLowerCamel", CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, modelNameUpperCamel));
             data.put("basePackage", BASE_PACKAGE);
+            data.put("IDType", IDType);
             <#--data.put("enabledSwagger", ENABLED_SWAGGER);-->
             File file = new File(PROJECT_PATH + JAVA_PATH + PACKAGE_PATH_CONTROLLER + modelNameUpperCamel + "Controller.java");
             if (!file.getParentFile().exists()) {

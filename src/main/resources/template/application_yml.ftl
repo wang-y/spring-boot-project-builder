@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: ${artifactId}
+  aop:
+    proxy-target-class: true
   mvc:
     throw-exception-if-no-handler-found: true
   resources:

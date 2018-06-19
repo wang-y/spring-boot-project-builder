@@ -525,6 +525,36 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/RequestContextHolderUtil.ftl").process(data, new FileWriter(file));
 
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/annotations/ServiceLog.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/logs/annotations/ServiceLog.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/RestControllerAspect.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/logs/aspect/RestControllerAspect.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/ServiceLogAspect.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/logs/aspect/ServiceLogAspect.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/IpUtil.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/logs/utils/IpUtil.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/LogAspectUtil.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/common/logs/utils/LogAspectUtil.ftl").process(data, new FileWriter(file));
+
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();

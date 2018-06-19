@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import ${corepackage}.page.SimplePage;
 import ${corepackage}.repo.IBasicRepository;
 import ${corepackage}.service.IBasicService;
+import ${corepackage}.common.logs.annotations.ServiceLog;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     protected abstract IBasicRepository<E, ID> getRepository();
 
     @Override
-
+    @ServiceLog(description = "持久化")
     public V save(V v) {
         E e=getRepository().save(voToEntity(v));
         v = entityToVo(e);
@@ -60,17 +61,20 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
+    @ServiceLog(description = "通过主键删除")
     public void delByID(ID id) {
         getRepository().deleteById(id);
     }
 
     @Override
+    @ServiceLog(description = "更新")
     public V update(V v) {
         getRepository().save(voToEntity(v));
         return v;
     }
 
     @Override
+    @ServiceLog(description = "通过条件查找并排序")
     public Collection<V> list(HashMap<String, Object> params, LinkedHashMap<String, String> orderBy) {
         List<E> eList = getRepository().findAll(params, orderBy);
         List<V> vList = new ArrayList<>();
@@ -79,16 +83,19 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
+    @ServiceLog(description = "通过条件查找")
     public Collection<V> list(HashMap<String, Object> params) {
         return list(params,null);
     }
 
     @Override
+    @ServiceLog(description = "获取所有")
     public Collection<V> listAll() {
         return getRepository().findAll().stream().map(e -> entityToVo(e)).collect(Collectors.toList());
     }
 
     @Override
+    @ServiceLog(description = "分页查询")
     public SimplePage<V> page(HashMap<String, Object> params, LinkedHashMap<String, String> orderBy, int page, int size) {
         SimplePage<E> epage = getRepository().findByPage(params, orderBy, size, page);
         SimplePage<V> vpage = new SimplePage<>(epage.getPageInfo());
@@ -97,21 +104,25 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
+    @ServiceLog(description = "通过逐渐查找")
     public V findOne(ID id) {
         return entityToVo(getRepository().findById(id).orElseGet(null));
     }
 
     @Override
+    @ServiceLog(description = "通过主键查找")
     public E searchOne(ID id) {
         return getRepository().findById(id).orElseGet(null);
     }
 
     @Override
+    @ServiceLog(description = "通过条件查找唯一对象")
     public V findOne(HashMap<String, Object> params) {
         return entityToVo(getRepository().findOne(params));
     }
 
     @Override
+    @ServiceLog(description = "通过主键集合删除")
     public void delBatchByID(Collection<ID> id) {
         getRepository().delete(id);
     }

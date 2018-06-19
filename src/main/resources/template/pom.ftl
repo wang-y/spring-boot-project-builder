@@ -193,6 +193,12 @@
             <artifactId>guava</artifactId>
             <version>24.0-jre</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.13</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,6 +1,7 @@
 package ${corepackage}.service.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import ${corepackage}.common.exception.DataNotFoundException;
 import ${corepackage}.page.SimplePage;
 import ${corepackage}.repo.IBasicRepository;
 import ${corepackage}.service.IBasicService;
@@ -104,15 +105,27 @@ public abstract class BasicService<V extends Serializable, E extends Serializabl
     }
 
     @Override
-    @ServiceLog(description = "通过逐渐查找")
+    @ServiceLog(description = "通过主键查找")
     public V findOne(ID id) {
-        return entityToVo(getRepository().findById(id).orElseGet(null));
+        Optional<E> optional = getRepository().findById(id);
+        V v;
+        if(optional.isPresent()){
+            v=entityToVo(optional.get());
+        }else{
+            throw new DataNotFoundException();
+        }
+        return v;
     }
 
     @Override
     @ServiceLog(description = "通过主键查找")
     public E searchOne(ID id) {
-        return getRepository().findById(id).orElseGet(null);
+        Optional<E> optional = getRepository().findById(id);
+        if(optional.isPresent()){
+            return optional.get();
+        }else{
+            throw new DataNotFoundException();
+        }
     }
 
     @Override

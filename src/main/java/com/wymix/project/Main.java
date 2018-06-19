@@ -23,8 +23,8 @@ public class Main {
         System.out.println("https://github.com/wang-y/spring-boot-project-builder");
         System.out.println("-----------------------------------------------------");
         System.out.println("                                           (欢迎fork)");
-        buildProject();
-//        build();
+//        buildProject();
+        build();
     }
 
 
@@ -34,7 +34,7 @@ public class Main {
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
                 .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
-                .setOrmType(OrmType.MYBATIS)
+                .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
 
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);

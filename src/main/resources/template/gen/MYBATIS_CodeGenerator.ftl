@@ -35,16 +35,18 @@ public class CodeGenerator {
     private static final String PACKAGE_PATH_SERVICE_IMPL = packageConvertPath(SERVICE_IMPL_PACKAGE);//生成的Service实现存放路径
     private static final String PACKAGE_PATH_CONTROLLER = packageConvertPath(CONTROLLER_PACKAGE);//生成的Controller存放路径
 
-    private static final String AUTHOR = "CodeGenerator";//@author
-    private static final String DATE = new SimpleDateFormat("yyyy/MM/dd").format(new Date());//@date
+    private static final String DATABASETYPE = "${databasetype}";
 
-    private static final String DATABASETYPE="${databasetype}";
+    //需要取消的表名前缀，手动编辑
+    private static final String REDUCE_TABLE_PREFIX = null;
+    //需要取消的字段名前缀，手动编辑
+    private static final String REDUCE_COLUMN_PREFIX = null;
 
     <#--private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";-->
 
     public static void main(String[] args) {
         genCode("test_table","Long");
-        //genCodeByCustomModelName("输入表名","输入自定义Model名称");
+        //genCodeByCustomModelName("输入表名","输入自定义Model名称","输入主键类型");
     }
 
     /**
@@ -53,7 +55,11 @@ public class CodeGenerator {
      * @param tableName 数据表名称...
      */
     public static void genCode(String tableName,String IDType) {
-       genCodeByCustomModelName(tableName, null,IDType);
+       String modelName=null;
+       if(REDUCE_TABLE_PREFIX != null){
+           modelName = getUpperCamel(tableName.replaceAll(String.format("^((?i)%s)", REDUCE_TABLE_PREFIX), ""));
+       }
+       genCodeByCustomModelName(tableName, modelName,IDType);
     }
 
     /**
@@ -68,6 +74,19 @@ public class CodeGenerator {
         genController(tableName, modelName,IDType);
     }
 
+    /**
+     * 获取字符串的大骆驼峰形式
+     */
+    private static String getUpperCamel(String str) {
+        //如果全大写，且包含下划线
+        if (str.replaceAll("[A-Z]+", "").equals(str) && str.contains("_"))
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
+        //如果不包含下划线
+        if (!str.contains("_") && str.length() > 2)
+            return str.toUpperCase().charAt(0) + str.substring(1);
+        //如果不全为大写，且包含下划线
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
+    }
 
     public static void genModelAndMapper(String tableName, String modelName) {
         Context context = new Context(ModelType.FLAT);
@@ -109,6 +128,12 @@ public class CodeGenerator {
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         TableConfiguration tableConfiguration = new TableConfiguration(context);
+        if(REDUCE_COLUMN_PREFIX!=null) {
+            ColumnRenamingRule columnRenamingRule = new ColumnRenamingRule();
+            columnRenamingRule.setSearchString("^"+REDUCE_COLUMN_PREFIX);
+            columnRenamingRule.setReplaceString("");
+            tableConfiguration.setColumnRenamingRule(columnRenamingRule);
+        }
         tableConfiguration.setTableName(tableName);
         if (StringUtils.isNotEmpty(modelName))
             tableConfiguration.setDomainObjectName(modelName);

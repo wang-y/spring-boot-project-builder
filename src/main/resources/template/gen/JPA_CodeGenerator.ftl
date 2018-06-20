@@ -32,6 +32,11 @@ public class CodeGenerator {
 
     private static final boolean ENABLED_SWAGGER="${enabled_swagger}" == "yes";
 
+    //需要取消的表名前缀，手动编辑
+    private static final String REDUCE_TABLE_PREFIX = null;
+    //需要取消的字段名前缀，手动编辑
+    private static final String REDUCE_COLUMN_PREFIX = null;
+
     private static final String DATABASETYPE="${databasetype}";
 
     public static void main(String[] args) {
@@ -243,7 +248,11 @@ public class CodeGenerator {
             if (ENABLED_SWAGGER && StringUtils.isNotBlank(info.getComment())) {
                 sb.append("    @ApiModelProperty(value = \"" + info.getComment() + "\")\r\n");
             }
-            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(info.getName()) + ";\r\n\r\n");
+            String columnName=info.getName();
+            if(REDUCE_COLUMN_PREFIX != null){
+                columnName=getUpperCamel(columnName.replaceAll(String.format("^((?i)%s)", REDUCE_COLUMN_PREFIX), ""));
+            }
+            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(columnName) + ";\r\n\r\n");
         }
 
     }
@@ -270,7 +279,11 @@ public class CodeGenerator {
             if (StringUtils.equalsIgnoreCase(javaType, "Date")) {
                 sb.append("    @Temporal(value = TemporalType.TIMESTAMP)\r\n");
             }
-            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(info.getName()) + ";");
+            String columnName=info.getName();
+            if(REDUCE_COLUMN_PREFIX != null){
+                columnName=getUpperCamel(columnName.replaceAll(String.format("^((?i)%s)", REDUCE_COLUMN_PREFIX), ""));
+            }
+            sb.append("    private " + javaType + " " + columnNameConvertUpperCamel(columnName) + ";");
             if (StringUtils.isNotBlank(info.getComment())) {
                 sb.append("  // " + info.getComment());
             }
@@ -402,6 +415,9 @@ public class CodeGenerator {
     }
 
     public static void genCode(String tablename,String modelname,String pkType){
+        if(REDUCE_TABLE_PREFIX != null){
+            modelname = getUpperCamel(tablename.replaceAll(String.format("^((?i)%s)", REDUCE_TABLE_PREFIX), ""));
+        }
         String name=genModelAndVo(tablename, modelname);
         genRepository(name,pkType);
         genService(name,pkType);
@@ -409,7 +425,11 @@ public class CodeGenerator {
     }
 
     public static void genCode(String tablename,String pkType){
-        String name=genModelAndVo(tablename, null);
+        String modelname=null;
+        if(REDUCE_TABLE_PREFIX != null){
+            modelname = getUpperCamel(tablename.replaceAll(String.format("^((?i)%s)", REDUCE_TABLE_PREFIX), ""));
+        }
+        String name=genModelAndVo(tablename, modelname);
         genRepository(name,pkType);
         genService(name,pkType);
         genWeb(name,pkType);
@@ -427,4 +447,15 @@ public class CodeGenerator {
         private String extra;
 
     }
+
+    private static String getUpperCamel(String str) {
+        //如果全大写，且包含下划线
+        if (str.replaceAll("[A-Z]+", "").equals(str) && str.contains("_"))
+            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str);
+        //如果不包含下划线
+        if (!str.contains("_") && str.length() > 2)
+            return str.toUpperCase().charAt(0) + str.substring(1);
+        //如果不全为大写，且包含下划线
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
+    }  
 }

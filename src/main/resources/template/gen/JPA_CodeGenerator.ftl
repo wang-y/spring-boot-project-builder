@@ -358,6 +358,7 @@ public class CodeGenerator {
             freemarker.template.Configuration cfg = getConfiguration();
 
             Map<String, Object> data = new HashMap<>();
+            data.put("baseRequestMapping",modelNameConvertMappingPath(modelName));
             data.put("modelName", modelName);
             data.put("PKType", pkType);
 
@@ -369,6 +370,16 @@ public class CodeGenerator {
         }catch (Exception e){
 
         }
+    }
+
+    private static String modelNameConvertMappingPath(String modelName) {
+        String tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, modelName);
+        return tableNameConvertMappingPath(tableName);
+    }
+
+    private static String tableNameConvertMappingPath(String tableName) {
+        tableName = tableName.toLowerCase();//兼容使用大写的表名
+        return "/" + (tableName.contains("_") ? tableName.replaceAll("_", "/") : tableName);
     }
 
     private static void genService(String modelName,String pkType) {

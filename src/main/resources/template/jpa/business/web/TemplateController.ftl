@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @RestController
-@RequestMapping("${model}")
+@RequestMapping("${baseRequestMapping}")
 public class ${modelName}Controller extends BasicController<${modelName}Vo,${modelName},${PKType}> {
 
     @Resource

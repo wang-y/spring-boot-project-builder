@@ -24,7 +24,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
 <#if enabledSwagger>
     @ApiOperation(value = "详情", notes = "根据主键查询详情")
 </#if>
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "{id}")
     public V getOne(@ApiParam(required = true, value = "主键") @PathVariable ID id) {
         return getService().findOne(id);
     }
@@ -75,7 +75,7 @@ public abstract class BasicController<V extends Serializable, E extends Serializ
 <#if enabledSwagger>
     @ApiOperation(value = "删除", notes = "根据主键删除数据")
 </#if>
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "{id}")
     public void del(@ApiParam(required = true, value = "主键") @PathVariable ID id) {
         getService().delByID(id);
     }

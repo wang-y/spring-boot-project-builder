@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 
 
 @Component
-public class OpenBrowseCommandRunner implements CommandLineRunner {
+public class OpenBrowserCommandRunner implements CommandLineRunner {
 
     @Autowired
     private Environment environment;

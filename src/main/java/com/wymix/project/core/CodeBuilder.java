@@ -600,11 +600,11 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/conf/CustomWebMvcConfigurer.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CONF + "OpenBrowseCommandRunner.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CONF + "OpenBrowserCommandRunner.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("common/conf/OpenBrowseCommandRunner.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("common/conf/OpenBrowserCommandRunner.ftl").process(data, new FileWriter(file));
 
             file = new File(getResourcePath()+ "static/home.html");
             if (!file.getParentFile().exists()) {

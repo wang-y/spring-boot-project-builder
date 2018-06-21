@@ -220,8 +220,9 @@ public class CodeGenerator {
         if (ENABLED_SWAGGER) {
             sb.append("import io.swagger.annotations.ApiModelProperty;\r\n");
         }
-        sb.append("import lombok.Builder;\r\n");
-        sb.append("import lombok.Data;\r\n\n");
+
+        sb.append("import lombok.Data;\r\n");
+        sb.append("import lombok.experimental.Accessors;\r\n\n");
         sb.append("import java.io.Serializable;\r\n");
         // 判断是否导入工具包
         if (f_util) {
@@ -236,7 +237,7 @@ public class CodeGenerator {
         sb.append(" */\r\n");
         // 实体部分
         sb.append("\r\n@Data");
-        sb.append("\r\n@Builder");
+        sb.append("\r\n@Accessors(chain = true)");
         sb.append("\r\npublic class " + tableNameConvertUpperCamel(tableName) + "Vo implements Serializable {\r\n\r\n");
         processAllAttrs2(sb, columnInfos);// 属性
         //processAllMethod(sb, colnames, colTypes);// get set方法

@@ -2,6 +2,7 @@ server:
   port: ${port}
   servlet:
     context-path: /${artifactId}
+  allowed-cross-domain: true
 
 spring:
   application:

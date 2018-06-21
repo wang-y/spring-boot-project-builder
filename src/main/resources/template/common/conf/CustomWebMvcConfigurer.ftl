@@ -5,16 +5,14 @@ import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import ${corepackage}.common.interceptor.ResponseResultInterceptor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -22,6 +20,9 @@ import java.util.List;
 @Slf4j
 @Configuration
 public class CustomWebMvcConfigurer implements WebMvcConfigurer {
+
+    @Value("${allowed_cross_domain}")
+    private boolean allowedCrossDomain;
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -47,6 +48,19 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     }
 
     @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        if (allowedCrossDomain) {
+            registry.addMapping("/**")
+                    .allowedOrigins("*")
+                    .allowedMethods("POST", "GET", "OPTIONS", " DELETE", "PUT", "PATCH")
+                    .allowCredentials(true).maxAge(0L)
+                    .allowedHeaders("Origin", " No-Cache", "X-Requested-With", "If-Modified-Since", "Pragma", "Last-Modified", "Cache-Control", "Expires", "Content-Type", "X-E4M-With", "userId", "token");
+        } else {
+            WebMvcConfigurer.super.addCorsMappings(registry);
+        }
+    }
+
+    @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addRedirectViewController("/", "/home.html");
     <#if enabledSwagger>
@@ -59,7 +73,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**.html").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/home.html").addResourceLocations("classpath:/static/home.html");
     <#if enabledSwagger>
         registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");

@@ -594,6 +594,7 @@ public final class CodeBuilder {
             data.put("confpackage", PACKAGE_CONF);
             data.put("corepackage", PACKAGE_CORE);
             data.put("enabledSwagger", projectConfig.enable_swagger);
+            data.put("allowed_cross_domain","${server.allowed-cross-domain}");
             File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "CustomWebMvcConfigurer.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

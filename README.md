@@ -4,7 +4,7 @@
 
 下载 release 版本：
 
-https://github.com/wang-y/spring-boot-project-builder/releases/download/1.0.2/spring-boot-project-builder.jar
+https://github.com/wang-y/spring-boot-project-builder/releases/download/1.0.3/spring-boot-project-builder.jar
 
 下载完成后 运行命令
 ```

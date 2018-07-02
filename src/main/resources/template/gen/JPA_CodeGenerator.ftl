@@ -5,10 +5,7 @@ import freemarker.template.TemplateExceptionHandler;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URI;
 import java.sql.*;
 import java.util.ArrayList;
@@ -39,6 +36,9 @@ public class CodeGenerator {
     private static final String REDUCE_TABLE_PREFIX = null;
     //需要取消的字段名前缀，手动编辑
     private static final String REDUCE_COLUMN_PREFIX = null;
+
+    //maven环境设置
+    private static final String PATH = "~/.zshrc";
 
     private static final String DATABASETYPE="${databasetype}";
 
@@ -439,6 +439,7 @@ public class CodeGenerator {
         genRepository(name,pkType);
         genService(name,pkType);
         genWeb(name,pkType);
+        execMvnCompile();
     }
 
     public static void genCode(String tablename,String pkType){
@@ -450,6 +451,7 @@ public class CodeGenerator {
         genRepository(name,pkType);
         genService(name,pkType);
         genWeb(name,pkType);
+        execMvnCompile();
     }
 
     @Data
@@ -474,5 +476,43 @@ public class CodeGenerator {
             return str.toUpperCase().charAt(0) + str.substring(1);
         //如果不全为大写，且包含下划线
         return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
-    }  
+    }
+
+    private static void execMvnCompile(){
+        Process proc = null;
+        String os = System.getProperty("os.name");
+        if (StringUtils.startsWithIgnoreCase(os, "win")) {
+            try {
+                proc = Runtime.getRuntime().exec("cmd /k cd " + PROJECT_PATH + " && mvn compile");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            File wd = new File(PROJECT_PATH);
+            try {
+                proc = Runtime.getRuntime().exec("/bin/bash", null, wd);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(proc.getOutputStream())), true);
+            out.println("source "+PATH);
+            out.println("mvn compile");
+            out.println("exit");
+            out.close();
+        }
+        if (proc != null) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            try {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    System.out.println(line);
+                }
+                proc.waitFor();
+                in.close();
+                proc.destroy();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

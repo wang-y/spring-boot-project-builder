@@ -1,8 +1,8 @@
 package ${corepackage}.common.result;
 
-import com.wymix.test.core.common.RequestContextHolderUtil;
-import com.wymix.test.core.common.exception.BusinessException;
-import com.wymix.test.core.common.exception.ExceptionEnum;
+import ${corepackage}.common.RequestContextHolderUtil;
+import ${corepackage}.common.exception.BusinessException;
+import ${corepackage}.common.exception.ExceptionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

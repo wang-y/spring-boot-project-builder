@@ -1,7 +1,6 @@
-package com.wymix.test.core.common.interceptor;
+package ${corepackage}.common.interceptor;
 
-import com.wymix.test.core.common.result.ResponseResult;
-import org.springframework.stereotype.Component;
+import ${corepackage}.common.result.ResponseResult;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;

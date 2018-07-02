@@ -56,6 +56,10 @@ spring:
         </#switch>
     </#if>
 </#if>
+logging:
+  level:
+    root: info
+    com.${company}.${artifactId}.*: debug
 
 ---
 spring:

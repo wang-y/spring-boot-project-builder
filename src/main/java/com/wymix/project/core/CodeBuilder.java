@@ -774,6 +774,7 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
 
             data.put("port", ""+this.projectConfig.port);
+            data.put("company", ""+this.projectConfig.company);
             data.put("artifactId", this.projectConfig.project);
             data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
             data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());

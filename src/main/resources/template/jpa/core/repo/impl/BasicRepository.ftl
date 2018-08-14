@@ -216,9 +216,9 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                     if (clazz != null && clazz.equals(String.class) && !StringUtils.endsWithAny(str, "_in", "_notin")
                             && StringUtils.endsWithAny(str, "_like", "_notlike")) {
                         if (valueMap != null) {
-                            query.setParameter(str, '%' + valueMap.get(str).toString() + '%');
+                            query.setParameter(replaceDotToUnderLine(str), '%' + valueMap.get(str).toString() + '%');
                         } else {
-                            query.setParameter(str, '%' + queryParams.get(key).toString() + '%');
+                            query.setParameter(replaceDotToUnderLine(str), '%' + queryParams.get(key).toString() + '%');
                         }
                     } else if (str.endsWith("_in") || str.endsWith("_notin")) {
                         Object t;
@@ -231,24 +231,24 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         if (t instanceof List) {
                             List<Object> list = (List<Object>) t;
                             for (Object object : list) {
-                                query.setParameter(str + list.indexOf(object), mapToClazz(object,clazz));
+                                query.setParameter(replaceDotToUnderLine(str) + list.indexOf(object), mapToClazz(object,clazz));
                             }
                         } else if (t.getClass().isArray()) {
                             Object[] array = (Object[]) t;
                             for (int i = 0; i < array.length; i++) {
-                                query.setParameter(str + i, mapToClazz(array[i],clazz));
+                                query.setParameter(replaceDotToUnderLine(str) + i, mapToClazz(array[i],clazz));
                             }
                         } else {
-                            query.setParameter(str, mapToClazz(queryParams.get(key),clazz));
+                            query.setParameter(replaceDotToUnderLine(str), mapToClazz(queryParams.get(key),clazz));
                         }
                     } else {
                         if (StringUtils.endsWithAny(str, "_null", "_notnull")) {
                             continue;
                         }
                         if (valueMap != null) {
-                            query.setParameter(str, mapToClazz(queryParams.get(str),clazz));
+                            query.setParameter(replaceDotToUnderLine(str), mapToClazz(queryParams.get(str),clazz));
                         }
-                        query.setParameter(str, mapToClazz(queryParams.get(key),clazz));
+                        query.setParameter(replaceDotToUnderLine(str), mapToClazz(queryParams.get(key),clazz));
                     }
                 }
             }
@@ -332,22 +332,22 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                     }
                     if (str.endsWith("_lessThan")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" <:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_greaterThan")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" >:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_lessOrEq")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" <=:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_greaterOrEq")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" >=:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_start")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" >=:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_end")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" <=:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_in")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" in (");
 
@@ -361,7 +361,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         if (t instanceof List) {
                             List<Object> list = (List<Object>) t;
                             for (Object object : list) {
-                                whereQueryHql.append(":" + str + list.indexOf(object));
+                                whereQueryHql.append(":" + replaceDotToUnderLine(str) + list.indexOf(object));
                                 if (list.indexOf(object) < list.size() - 1) {
                                     whereQueryHql.append(",");
                                 }
@@ -369,13 +369,13 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         } else if (t.getClass().isArray()) {
                             Object[] array = (Object[]) t;
                             for (int i = 0; i < array.length; i++) {
-                                whereQueryHql.append(":" + str + i);
+                                whereQueryHql.append(":" + replaceDotToUnderLine(str) + i);
                                 if (i < array.length - 1) {
                                     whereQueryHql.append(",");
                                 }
                             }
                         } else {
-                            whereQueryHql.append(":" + str);
+                            whereQueryHql.append(":" + replaceDotToUnderLine(str));
                         }
                         whereQueryHql.append(")");
                     } else if (str.endsWith("_notin")) {
@@ -391,7 +391,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         if (t instanceof List) {
                             List<Object> list = (List<Object>) t;
                             for (Object object : list) {
-                                whereQueryHql.append(":" + str + list.indexOf(object));
+                                whereQueryHql.append(":" + replaceDotToUnderLine(str) + list.indexOf(object));
                                 if (list.indexOf(object) < list.size() - 1) {
                                     whereQueryHql.append(",");
                                 }
@@ -399,13 +399,13 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                         } else if (t.getClass().isArray()) {
                             Object[] array = (Object[]) t;
                             for (int i = 0; i < array.length; i++) {
-                                whereQueryHql.append(":" + str + i);
+                                whereQueryHql.append(":" + replaceDotToUnderLine(str) + i);
                                 if (i < array.length - 1) {
                                     whereQueryHql.append(",");
                                 }
                             }
                         } else {
-                            whereQueryHql.append(":" + str);
+                            whereQueryHql.append(":" + replaceDotToUnderLine(str));
                         }
                         whereQueryHql.append(")");
                     } else if (str.endsWith("_null")) {
@@ -415,24 +415,24 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
                                 .append(" is not null");
                     } else if (str.endsWith("_eq")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" =:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_noteq")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" <>:")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_like")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" like :")
-                                .append(str);
+                                .append(replaceDotToUnderLine(str));
                     } else if (str.endsWith("_notlike")) {
                         whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str))
-                                .append(" not like :").append(str);
+                                .append(" not like :").append(replaceDotToUnderLine(str));
                     } else {
                         Class<?> clazz = getFieldType(this.getDomainClass(), key);
                         if (clazz != null && clazz.equals(String.class)) {
                             whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str))
-                                    .append(" like :").append(str);
+                                    .append(" like :").append(replaceDotToUnderLine(str));
                         } else {
                             whereQueryHql.append(andOr).append("entity.").append(replaceAllSuffix(str)).append(" =:")
-                                    .append(str);
+                                    .append(replaceDotToUnderLine(str));
                         }
 
                     }
@@ -566,8 +566,24 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
     private static Class<?> getFieldType(Class<?> entityClass, String fieldName) {
         Assert.notNull(entityClass, "entityClass must not be null");
         Assert.notNull(fieldName, "fieldName must not be null");
+
+        if(fieldName.contains(".")){
+            int len = StringUtils.countMatches(fieldName, ".");
+            String[] strings = fieldName.split("\\.");
+            for (int i = 0; i < len; i++) {
+                PropertyDescriptor pd = getPropertyDescriptor(entityClass, strings[i]);
+                entityClass=pd.getPropertyType();
+                fieldName=strings[i+1];
+            }
+        }
+
         PropertyDescriptor pd = getPropertyDescriptor(entityClass, fieldName);
         return pd.getPropertyType();
+    }
+
+    private static String replaceDotToUnderLine(String str){
+        String result=str.replaceAll("\\.","_");
+        return result;
     }
 
 }

@@ -1,5 +1,7 @@
 package ${corepackage}.common.result;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -72,10 +74,11 @@ public class PlatformResult<T> implements Result {
 
     @Override
     public String toString() {
-        return "PlatformResult{" +
-               "code=" + code +
-               ", message='" + message + '\'' +
-               ", data=" + data +
-               '}';
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

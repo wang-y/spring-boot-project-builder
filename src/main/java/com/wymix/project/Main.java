@@ -34,7 +34,7 @@ public class Main {
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
                 .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
-                .setOrmType(OrmType.MYBATIS)
+                .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
 
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);

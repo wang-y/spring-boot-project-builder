@@ -1,7 +1,5 @@
 package ${corepackage}.common.result;
 
-
-import com.alibaba.fastjson.JSON;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -74,6 +72,10 @@ public class PlatformResult<T> implements Result {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        return "PlatformResult{" +
+               "code=" + code +
+               ", message='" + message + '\'' +
+               ", data=" + data +
+               '}';
     }
 }

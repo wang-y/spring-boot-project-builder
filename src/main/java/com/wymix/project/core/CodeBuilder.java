@@ -752,8 +752,6 @@ public final class CodeBuilder {
 
             data.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
             data.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
-            data.put("FASTJSON_VERSION", VersionConstants.FASTJSON_VERSION);
-
 
             File file = new File(getRoot() + "/pom.xml");
             if (!file.getParentFile().exists()) {

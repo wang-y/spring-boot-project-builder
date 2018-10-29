@@ -51,7 +51,7 @@ public class ServiceLogAspect {
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long end = System.currentTimeMillis();
-        String deleteSensitiveContent =  LogAspectUtil.deleteSensitiveContent(result);
+        String deleteSensitiveContent =  LogAspectUtil.convertObj2Str(result);
         logger.debug("结束请求方法:[{}] 参数:[{}] 返回结果[{}] 耗时:[{}]毫秒 ",
                 methodName, methodParams, deleteSensitiveContent, end - start);
         return result;

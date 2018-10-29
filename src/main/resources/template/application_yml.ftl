@@ -7,6 +7,8 @@ server:
 spring:
   application:
     name: ${artifactId}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   aop:
     proxy-target-class: true
   mvc:

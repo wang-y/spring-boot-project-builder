@@ -1,14 +1,11 @@
 package ${corepackage}.common.logs.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * Description:
@@ -19,6 +16,8 @@ public class LogAspectUtil {
     private LogAspectUtil(){
 
     }
+
+    private static ObjectMapper objectMapper;
 
     /**
      * 获取需要记录日志方法的参数，敏感参数用*代替
@@ -42,7 +41,7 @@ public class LogAspectUtil {
                 long size = ((MultipartFile) arg).getSize();
                 paramStr = MultipartFile.class.getSimpleName() + " size:" + size;
             } else {
-                paramStr = deleteSensitiveContent(arg);
+                paramStr = convertObj2Str(arg);
             }
             sb.append(paramStr).append(",");
         }
@@ -50,37 +49,24 @@ public class LogAspectUtil {
     }
 
     /**
-     * 删除参数中的敏感内容
+     * 对象转换为字符串
+     *
      * @param obj 参数对象
-     * @return 去除敏感内容后的参数对象
+     * @return 参数对象
      */
-    public static String deleteSensitiveContent(Object obj) {
-        JSONObject jsonObject = new JSONObject();
-        if (obj == null || obj instanceof Exception) {
-            return jsonObject.toJSONString();
+    public static String convertObj2Str(Object obj) {
+        if(objectMapper==null){
+            objectMapper = new ObjectMapper();
         }
-        String param = JSON.toJSONString(obj);
+        if (obj == null || obj instanceof Exception) {
+            return "{}";
+        }
+        String param;
         try {
-            jsonObject = JSONObject.parseObject(param);
-        }catch (Exception e) {
+            param = objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
             return String.valueOf(obj);
         }
-        List<String> sensitiveFieldList = getSensitiveFieldList();
-        for (String sensitiveField : sensitiveFieldList) {
-            if (jsonObject.containsKey(sensitiveField)) {
-                jsonObject.put(sensitiveField, "******");
-            }
-        }
-        return jsonObject.toJSONString();
-    }
-
-    /**
-     * 敏感字段列表（当然这里你可以更改为可配置的）
-     */
-    private static List<String> getSensitiveFieldList() {
-        List<String> sensitiveFieldList = Lists.newArrayList();
-        sensitiveFieldList.add("pwd");
-        sensitiveFieldList.add("password");
-        return sensitiveFieldList;
+        return param;
     }
 }

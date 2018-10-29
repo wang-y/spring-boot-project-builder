@@ -82,6 +82,10 @@
             <artifactId>querydsl-apt</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
         <#break>
         <#case "MYBATIS">
         <dependency>
@@ -175,11 +179,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.8.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
         </dependency>
 
         <dependency>

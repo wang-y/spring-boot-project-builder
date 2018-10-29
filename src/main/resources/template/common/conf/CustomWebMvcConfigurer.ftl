@@ -63,7 +63,7 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/home.html").addResourceLocations("classpath:/static/home.html");
     <#if enabledSwagger>
-        registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
+        registry.addResourceHandler("/doc.html**").addResourceLocations("classpath:/META-INF/resources/doc.html");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     </#if>
     }

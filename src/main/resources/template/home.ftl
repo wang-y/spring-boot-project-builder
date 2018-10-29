@@ -87,7 +87,7 @@
 <div class="test">
     <p><a href="https://github.com/wang-y/spring-boot-project-builder">欢迎使用</a></p>
     <#if enabledSwagger>
-    <p><a href="swagger-ui.html">前往swagger页面</a></p>
+    <p><a href="doc.html">前往swagger页面</a></p>
     </#if>
     <p><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By:WYMIX</a></p>
 </div>

@@ -29,13 +29,13 @@ public class Main {
 
 
     private static void buildProject() {
-        ProjectConfig projectConfig = ProjectConfig.project("test")
+        ProjectConfig projectConfig = ProjectConfig.project("docker.test")
                 .company("wymix")
                 .enableSwagger()
-                .setDataBaseType(DataBaseType.MYSQL)
+                .setDataBaseType(DataBaseType.NONE)
                 .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
                 .setOrmType(OrmType.JPA)
-                .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP);
+                .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP).enableDocker();
 
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);
     }
@@ -180,6 +180,21 @@ public class Main {
             projectConfig.setDataBaseConnectPool(dataBaseConnectPool);
             System.out.println("项目 [" + project + "] 数据库连接池采用 [" + dataBaseConnectPool.toString() + "]。\n");
         }
+
+        System.out.println("是否启用Docker：");
+        System.out.println("    0. 禁用");
+        System.out.println("    1. 启用");
+        System.out.print("请选择(默认禁用)：");
+        boolean enableDocker = false;
+        String enableDockerstr = scanner.nextLine();
+        if (StringUtils.isNotBlank(enableDockerstr)) {
+            if (StringUtils.equals(enableDockerstr, "1")) {
+                projectConfig.enableDocker();
+                enableDocker = true;
+            }
+        }
+        System.out.println("项目 [" + project + "] " + (enableDocker ? "启用" : "禁用") + " Docker。\n");
+
 
         System.out.println("开始构建 [" + project + "] 项目...");
         CodeBuilder.toFilePath(path).build(projectConfig);

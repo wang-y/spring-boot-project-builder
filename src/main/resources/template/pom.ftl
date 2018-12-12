@@ -18,6 +18,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <#if enableDocker >
+        <docker.image.prefix>${groupId}</docker.image.prefix>
+        </#if>
     </properties>
 
     <dependencies>
@@ -228,6 +231,26 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+<#if enableDocker >
+            <!-- Docker maven plugin -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.2.0</version>
+                <configuration>
+                    <imageName>${dockerimageprefix}/${projectartifactId}</imageName>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${directory}</directory>
+                            <include>${finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+            <!-- Docker maven plugin -->
+</#if>
 <#if enableDatabase && ormType == "JPA">
             <plugin>
                 <groupId>com.mysema.maven</groupId>

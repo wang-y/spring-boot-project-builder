@@ -14,6 +14,7 @@ public class ProjectConfig {
     protected int port = 8080;
     protected String contextPath;
     protected boolean enable_swagger = true;
+    protected boolean enable_docker = false;
 
     private ProjectConfig() {
 
@@ -38,6 +39,16 @@ public class ProjectConfig {
 
     public ProjectConfig disableSwagger() {
         this.enable_swagger = false;
+        return this;
+    }
+
+    public ProjectConfig enableDocker() {
+        this.enable_docker = true;
+        return this;
+    }
+
+    public ProjectConfig disableDocker() {
+        this.enable_docker = false;
         return this;
     }
 

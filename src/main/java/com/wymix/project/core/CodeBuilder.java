@@ -89,30 +89,56 @@ public final class CodeBuilder {
         createApplication();
         createStarter();
 
-        switch (projectConfig.dataBaseConfig.getOrmType()) {
-            case JPA:
-                createJPACore();
-                createJPAConf();
-                genJPABusinessLogicCode();
-                break;
-            case MYBATIS:
-                createMyBatisCore();
-                createMyBatisConf();
-                break;
-            default:
-                createJPACore();
-                createJPAConf();
-                genJPABusinessLogicCode();
-                break;
+        if(!projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE)) {
+            switch (projectConfig.dataBaseConfig.getOrmType()) {
+                case JPA:
+                    createJPACore();
+                    createJPAConf();
+                    genJPABusinessLogicCode();
+                    break;
+                case MYBATIS:
+                    createMyBatisCore();
+                    createMyBatisConf();
+                    break;
+                default:
+                    createJPACore();
+                    createJPAConf();
+                    genJPABusinessLogicCode();
+                    break;
+            }
+            createTemplateCode();
         }
         createCommonCore();
         createCommonConf();
         if (projectConfig.enable_swagger) {
             createSwaggerConf();
         }
-        createTemplateCode();
+        if(projectConfig.enable_docker){
+            createDockerfile();
+        }
         createBanner();
         System.out.println("项目创建完毕！");
+    }
+
+    private void createDockerfile() {
+        String dockerPath = getRoot() + "/src/main/docker";
+        try {
+            freemarker.template.Configuration cfg = getConfiguration();
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("artifactId", this.projectConfig.project);
+
+            File dockerfile = new File(dockerPath + "/Dockerfile");
+            if (!dockerfile.getParentFile().exists()) {
+                dockerfile.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("Dockerfile.ftl").process(data, new FileWriter(dockerfile));
+        } catch (Exception e) {
+            System.out.println("Dockerfile生成失败！");
+            e.printStackTrace();
+            deleteProject();
+        }
+        System.out.println("Dockerfile生成完毕！");
     }
 
     private void checkConfig() {
@@ -744,6 +770,7 @@ public final class CodeBuilder {
             data.put("groupId", this.projectConfig.company);
             data.put("artifactId", this.projectConfig.project);
             data.put("enabledSwagger", this.projectConfig.enable_swagger);
+            data.put("enableDocker", this.projectConfig.enable_docker);
             data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
             data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());
             data.put("ormType", this.projectConfig.dataBaseConfig.getOrmType().toString());
@@ -752,6 +779,11 @@ public final class CodeBuilder {
 
             data.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
             data.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
+
+            data.put("dockerimageprefix","${docker.image.prefix}");
+            data.put("projectartifactId","${project.artifactId}");
+            data.put("directory","${project.build.directory}");
+            data.put("finalName","${project.build.finalName}");
 
             File file = new File(getRoot() + "/pom.xml");
             if (!file.getParentFile().exists()) {

@@ -197,30 +197,6 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("mybatis/core/mapper/Mapper.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/InsertMapper.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/mapper/InsertMapper.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/DeleteMapper.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/mapper/DeleteMapper.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/UpdateMapper.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/mapper/UpdateMapper.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/SelectMapper.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/mapper/SelectMapper.ftl").process(data, new FileWriter(file));
-
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/Service.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();

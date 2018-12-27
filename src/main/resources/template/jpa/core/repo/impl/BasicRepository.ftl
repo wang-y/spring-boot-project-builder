@@ -499,7 +499,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public List<Map<String, Object>> dosql(String sql, Object... value) {
+    public List<Map<String, Object>> findAllBySql(String sql, Object... value) {
         Query query = this.em.createNativeQuery(sql);
 
         int i = 1;
@@ -517,7 +517,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
 
     @SuppressWarnings({"unchecked"})
     @Override
-    public Map<String, Object> execsql(String sql, Object... value) {
+    public Map<String, Object> findOneBySql(String sql, Object... value) {
         Query query = this.em.createNativeQuery(sql);
 
         int i = 1;
@@ -535,7 +535,7 @@ public class BasicRepository<T, ID extends Serializable> extends QuerydslJpaRepo
     }
 
     @Override
-    public int ddl(String sql, Object... value) {
+    public int execute(String sql, Object... value) {
         Query query = this.em.createNativeQuery(sql);
         int i = 1;
 

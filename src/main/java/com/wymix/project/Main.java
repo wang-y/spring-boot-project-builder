@@ -52,8 +52,9 @@ public class Main {
         System.out.println("    1. 组织(org)");
         System.out.println("    2. 个人(自定义)");
         System.out.print("请选择(默认为企业)：");
+        String type ="type";
         while (true) {
-            String type = scanner.nextLine();
+            type = scanner.nextLine();
             if (StringUtils.isNotBlank(type)) {
                 if (StringUtils.equals(type, "0")) {
                     type = "com";
@@ -105,7 +106,7 @@ public class Main {
         }
         System.out.println("项目名称为： [" + project + "] 。\n");
 
-        ProjectConfig projectConfig = ProjectConfig.project(project).name(name).enableSwagger();
+        ProjectConfig projectConfig = ProjectConfig.project(project).customType(type).name(name).enableSwagger();
 
         System.out.print("请输入项目占用端口(默认:8080)：");
         String port = "";

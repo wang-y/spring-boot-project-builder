@@ -61,7 +61,7 @@ spring:
 logging:
   level:
     root: info
-    com.${company}.${artifactId}.*: debug
+    ${type}.${name}.${artifactId}.*: debug
 
 ---
 spring:

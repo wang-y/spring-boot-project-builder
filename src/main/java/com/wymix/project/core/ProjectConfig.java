@@ -7,10 +7,10 @@ import com.wymix.project.core.constant.OrmType;
 
 public class ProjectConfig {
 
-
-    protected DataBaseConfig dataBaseConfig;
-    protected String company;
+    protected String type="com";
+    protected String name;
     protected String project;
+    protected DataBaseConfig dataBaseConfig;
     protected int port = 8080;
     protected String contextPath;
     protected boolean enable_swagger = true;
@@ -20,8 +20,8 @@ public class ProjectConfig {
 
     }
 
-    public ProjectConfig company(String company) {
-        this.company = company;
+    public ProjectConfig name(String name) {
+        this.name = name;
         return this;
     }
 
@@ -30,6 +30,21 @@ public class ProjectConfig {
         projectConfig.project = project;
         projectConfig.dataBaseConfig = new DataBaseConfig(projectConfig);
         return projectConfig;
+    }
+
+    public ProjectConfig com() {
+        this.type = "com";
+        return this;
+    }
+
+    public ProjectConfig org() {
+        this.type = "org";
+        return this;
+    }
+
+    public ProjectConfig customType(String type) {
+        this.type = type;
+        return this;
     }
 
     public ProjectConfig enableSwagger() {

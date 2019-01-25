@@ -73,7 +73,7 @@ public final class CodeBuilder {
         this.projectConfig = projectConfig;
 
         checkConfig();
-        String basepackage = "com." + projectConfig.company + "." + projectConfig.project;
+        String basepackage = projectConfig.type+"." + projectConfig.name + "." + projectConfig.project;
 
         PACKAGE_CONF = basepackage + ".conf";
         PACKAGE_CORE = basepackage + ".core";
@@ -142,8 +142,8 @@ public final class CodeBuilder {
     }
 
     private void checkConfig() {
-        if(StringUtils.isBlank(projectConfig.company)){
-            throw new NullPointerException("company can not null!");
+        if(StringUtils.isBlank(projectConfig.name)){
+            throw new NullPointerException("name can not null!");
         }
         if(StringUtils.isBlank(projectConfig.project)){
             throw new NullPointerException("project can not null!");
@@ -743,7 +743,7 @@ public final class CodeBuilder {
             freemarker.template.Configuration cfg = getConfiguration();
             Map<String, Object> data = new HashMap<>();
 
-            data.put("groupId", this.projectConfig.company);
+            data.put("groupId", this.projectConfig.type+"."+this.projectConfig.name);
             data.put("artifactId", this.projectConfig.project);
             data.put("enabledSwagger", this.projectConfig.enable_swagger);
             data.put("enableDocker", this.projectConfig.enable_docker);
@@ -780,7 +780,8 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
 
             data.put("port", ""+this.projectConfig.port);
-            data.put("company", ""+this.projectConfig.company);
+            data.put("type", ""+this.projectConfig.type);
+            data.put("name", ""+this.projectConfig.name);
             data.put("artifactId", this.projectConfig.project);
             data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
             data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());

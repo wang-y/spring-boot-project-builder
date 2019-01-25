@@ -29,12 +29,12 @@ public class Main {
 
 
     private static void buildProject() {
-        ProjectConfig projectConfig = ProjectConfig.project("test")
-                .company("wymix")
+        ProjectConfig projectConfig = ProjectConfig.project("test").org()
+                .name("wymix")
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
                 .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
-                .setOrmType(OrmType.MYBATIS)
+                .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP).enableDocker();
 
         CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);
@@ -46,18 +46,51 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String path = scanner.nextLine();
         System.out.println("项目将创建到 [" + path + "] 路径下。\n");
-        String company ="wymix";
-        System.out.print("请输入个人/企业英文名称或缩写（小写）：");
+
+        System.out.println("请选择组织类型：");
+        System.out.println("    0. 企业(com)");
+        System.out.println("    1. 组织(org)");
+        System.out.println("    2. 个人(自定义)");
+        System.out.print("请选择(默认为企业)：");
+        while (true) {
+            String type = scanner.nextLine();
+            if (StringUtils.isNotBlank(type)) {
+                if (StringUtils.equals(type, "0")) {
+                    type = "com";
+                    break;
+                } else if (StringUtils.equals(type, "1")) {
+                    type = "org";
+                    break;
+                } else if (StringUtils.equals(type, "2")) {
+                    while(true) {
+                        System.out.print("自定义（小写）：");
+                        type = scanner.nextLine();
+                        if (type.matches("^[a-z]+$")) {
+                            break;
+                        } else {
+                            System.out.println("输入错误，请重新输入");
+                        }
+                    }
+                    break;
+                }else{
+                    System.out.println("输入错误，请重新输入");
+                    System.out.print("请选择(默认为企业)：");
+                }
+            }
+        }
+
+        String name ="wymix";
+        System.out.print("请输入企业/组织/个人英文名称或缩写（小写）：");
         while (true){
-            company = scanner.nextLine();
-            if(company.matches("^[a-z]+$")){
+            name = scanner.nextLine();
+            if(name.matches("^[a-z]+$")){
                 break;
             }else{
                 System.out.println("输入错误，请重新输入");
                 System.out.print("请输入个人/企业英文名称或缩写（小写）：");
             }
         }
-        System.out.println("项目名称为： [" + company + "] 。\n");
+        System.out.println("企业/组织/个人名称为： [" + name + "] 。\n");
 
         System.out.print("请输入项目英文名称或缩写：");
         String project = "test";
@@ -72,7 +105,7 @@ public class Main {
         }
         System.out.println("项目名称为： [" + project + "] 。\n");
 
-        ProjectConfig projectConfig = ProjectConfig.project(project).company(company).enableSwagger();
+        ProjectConfig projectConfig = ProjectConfig.project(project).name(name).enableSwagger();
 
         System.out.print("请输入项目占用端口(默认:8080)：");
         String port = "";

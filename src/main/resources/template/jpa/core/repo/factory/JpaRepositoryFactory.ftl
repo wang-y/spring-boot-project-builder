@@ -10,7 +10,8 @@ import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.data.repository.query.EvaluationContextProvider;
+import org.springframework.data.jpa.repository.query.EscapeCharacter;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -21,58 +22,58 @@ import java.util.Optional;
 
 public class JpaRepositoryFactory extends RepositoryFactorySupport {
 
-    private final EntityManager entityManager;
-    private final QueryExtractor extractor;
-    private final CrudMethodMetadataPostProcessor crudMethodMetadataPostProcessor;
+private final EntityManager entityManager;
+private final QueryExtractor extractor;
+private final CrudMethodMetadataPostProcessor crudMethodMetadataPostProcessor;
 
-    public JpaRepositoryFactory(EntityManager entityManager) {
+public JpaRepositoryFactory(EntityManager entityManager) {
 
-        Assert.notNull(entityManager, "EntityManager must not be null!");
+Assert.notNull(entityManager, "EntityManager must not be null!");
 
-        this.entityManager = entityManager;
-        this.extractor = PersistenceProvider.fromEntityManager(entityManager);
-        this.crudMethodMetadataPostProcessor = new CrudMethodMetadataPostProcessor();
+this.entityManager = entityManager;
+this.extractor = PersistenceProvider.fromEntityManager(entityManager);
+this.crudMethodMetadataPostProcessor = new CrudMethodMetadataPostProcessor();
 
-        addRepositoryProxyPostProcessor(crudMethodMetadataPostProcessor);
-    }
+addRepositoryProxyPostProcessor(crudMethodMetadataPostProcessor);
+}
 
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        super.setBeanClassLoader(classLoader);
-        this.crudMethodMetadataPostProcessor.setBeanClassLoader(classLoader);
-    }
+@Override
+public void setBeanClassLoader(ClassLoader classLoader) {
+super.setBeanClassLoader(classLoader);
+this.crudMethodMetadataPostProcessor.setBeanClassLoader(classLoader);
+}
 
-    @Override
-    public <T, ID> EntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
-        return (JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager);
+@Override
+public <T, ID> EntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
+    return (JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager);
     }
 
     @Override
     protected Object getTargetRepository(RepositoryInformation information) {
 
-        BasicRepository<?, ?> repository = getTargetRepository(information, entityManager);
-        repository.setRepositoryMethodMetadata(crudMethodMetadataPostProcessor.getCrudMethodMetadata());
+    BasicRepository<?, ?> repository = getTargetRepository(information, entityManager);
+    repository.setRepositoryMethodMetadata(crudMethodMetadataPostProcessor.getCrudMethodMetadata());
 
-        return repository;
+    return repository;
     }
 
     protected <T, ID extends Serializable> BasicRepository<T, ID> getTargetRepository(
-            RepositoryInformation information, EntityManager entityManager) {
+    RepositoryInformation information, EntityManager entityManager) {
 
-        EntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
+    EntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
 
-        return getTargetRepositoryViaReflection(information, entityInformation, entityManager);
+    return getTargetRepositoryViaReflection(information, entityInformation, entityManager);
     }
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-        return BasicRepository.class;
+    return BasicRepository.class;
     }
 
     @Override
     protected Optional<QueryLookupStrategy> getQueryLookupStrategy(@Nullable QueryLookupStrategy.Key key,
-                                                                   EvaluationContextProvider evaluationContextProvider) {
-        return Optional.of(JpaQueryLookupStrategy.create(entityManager, key, extractor, evaluationContextProvider));
+        QueryMethodEvaluationContextProvider evaluationContextProvider) {
+        return Optional.of(JpaQueryLookupStrategy.create(entityManager, key, extractor, evaluationContextProvider, EscapeCharacter.DEFAULT));
     }
 
 }

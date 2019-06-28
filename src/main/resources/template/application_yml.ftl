@@ -9,6 +9,8 @@ spring:
     name: ${artifactId}
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
   aop:
     proxy-target-class: true
   mvc:

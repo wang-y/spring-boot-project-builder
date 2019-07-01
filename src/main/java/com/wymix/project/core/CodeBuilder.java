@@ -89,13 +89,11 @@ public final class CodeBuilder {
         createApplication();
         createStarter();
 
+        createCommonCore();
+        createCommonConf();
+
         if(!projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE)) {
             switch (projectConfig.dataBaseConfig.getOrmType()) {
-                case JPA:
-                    createJPACore();
-                    createJPAConf();
-                    genJPABusinessLogicCode();
-                    break;
                 case MYBATIS:
                     createMyBatisCore();
                     createMyBatisConf();
@@ -103,13 +101,10 @@ public final class CodeBuilder {
                 default:
                     createJPACore();
                     createJPAConf();
-                    genJPABusinessLogicCode();
                     break;
             }
-            createTemplateCode();
+//            createTemplateCode();
         }
-        createCommonCore();
-        createCommonConf();
         if (projectConfig.enable_swagger) {
             createSwaggerConf();
         }
@@ -190,26 +185,20 @@ public final class CodeBuilder {
 
             Map<String, Object> data = new HashMap<>();
             data.put("corepackage", PACKAGE_CORE);
-
-            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "mapper/Mapper.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/mapper/Mapper.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/Service.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/service/Service.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/AbstractService.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("mybatis/core/service/impl/AbstractService.ftl").process(data, new FileWriter(file));
-
             data.put("basepackage", BASE_PACKAGE);
+
+            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/ServiceImpl.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/service/impl/ServiceImpl.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/support/SearchQuerySupport.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("mybatis/core/service/support/SearchQuerySupport.ftl").process(data, new FileWriter(file));
+
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "constant/ProjectConstant.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -381,30 +370,6 @@ public final class CodeBuilder {
         System.out.println("swagger配置类生成完毕！");
     }
 
-    private void genJPABusinessLogicCode() {
-        File file = new File(getJavaPath() + BASE_PACKAGE_PATH + "business/repository");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        file = new File(getJavaPath() + BASE_PACKAGE_PATH + "business/service/impl");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        file = new File(getJavaPath() + BASE_PACKAGE_PATH + "business/web");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        file = new File(getJavaPath() + BASE_PACKAGE_PATH + "business/model");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        file = new File(getJavaPath() + BASE_PACKAGE_PATH + "business/vo");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        System.out.println("JPA业务包创建完毕！");
-    }
-
     private void createCommonCore() {
         try {
             freemarker.template.Configuration cfg = getConfiguration();
@@ -413,6 +378,9 @@ public final class CodeBuilder {
             data.put("corepackage", PACKAGE_CORE);
             data.put("enabledSwagger", projectConfig.enable_swagger);
 
+            /**
+             * request body
+             */
             File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PageRequest.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -425,6 +393,9 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/body/PostRequest.ftl").process(data, new FileWriter(file));
 
+            /**
+             * exception
+             */
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BaseGlobalExceptionHandler.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -497,12 +468,18 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/exception/UserNotLoginException.ftl").process(data, new FileWriter(file));
 
+            /**
+             * interceptor
+             */
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/interceptor/ResponseResultInterceptor.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
             cfg.getTemplate("common/core/common/interceptor/ResponseResultInterceptor.ftl").process(data, new FileWriter(file));
 
+            /**
+             * result
+             */
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/result/DefaultErrorResult.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -551,6 +528,9 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/RequestContextHolderUtil.ftl").process(data, new FileWriter(file));
 
+            /**
+             * logs
+             */
             file = new File(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/annotations/ServiceLog.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -581,6 +561,37 @@ public final class CodeBuilder {
             }
             cfg.getTemplate("common/core/common/logs/utils/LogAspectUtil.ftl").process(data, new FileWriter(file));
 
+            /**
+             * page
+             */
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "page/PageInfo.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/page/PageInfo.ftl").process(data, new FileWriter(file));
+
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "page/SimplePage.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/page/SimplePage.ftl").process(data, new FileWriter(file));
+
+            /**
+             * service
+             */
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/IService.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/service/IService.ftl").process(data, new FileWriter(file));
+            /**
+             * service
+             */
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "web/CommonController.java");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            cfg.getTemplate("common/core/web/CommonController.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();
@@ -628,11 +639,11 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
             data.put("confpackage", PACKAGE_CONF);
             data.put("corepackage", PACKAGE_CORE);
-            File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "JPAConfig.java");
+            File file = new File(getJavaPath() + PACKAGE_PATH_CONF + "JpaConfigurer.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("jpa/conf/JPAConfig.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("jpa/conf/JpaConfigurer.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("JPA配置类生成失败！");
             e.printStackTrace();
@@ -648,70 +659,24 @@ public final class CodeBuilder {
             Map<String, Object> data = new HashMap<>();
             data.put("corepackage", PACKAGE_CORE);
 
-            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repo/IBasicRepository.java");
+            File file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repository/IRepository.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("jpa/core/repo/IBasicRepository.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("jpa/core/repository/IRepository.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repo/impl/BasicRepository.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repository/impl/RepositoryImpl.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("jpa/core/repo/impl/BasicRepository.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("jpa/core/repository/impl/RepositoryImpl.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repo/factory/CrudMethodMetadataPostProcessor.java");
+            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/ServiceImpl.java");
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
-            cfg.getTemplate("jpa/core/repo/factory/CrudMethodMetadataPostProcessor.ftl").process(data, new FileWriter(file));
+            cfg.getTemplate("jpa/core/service/impl/ServiceImpl.ftl").process(data, new FileWriter(file));
 
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repo/factory/JpaRepositoryFactory.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/repo/factory/JpaRepositoryFactory.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "repo/factory/JpaRepositoryFactoryBean.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/repo/factory/JpaRepositoryFactoryBean.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "page/PageInfo.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/page/PageInfo.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "page/SimplePage.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/page/SimplePage.ftl").process(data, new FileWriter(file));
-
-            //
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/BasicService.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/service/impl/BasicService.ftl").process(data, new FileWriter(file));
-
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "service/IBasicService.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/service/IBasicService.ftl").process(data, new FileWriter(file));
-            //
-            //
-            //
-            data.put("enabledSwagger", projectConfig.enable_swagger);
-            file = new File(getJavaPath() + PACKAGE_PATH_CORE + "web/BasicController.java");
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            cfg.getTemplate("jpa/core/web/BasicController.ftl").process(data, new FileWriter(file));
         } catch (Exception e) {
             System.out.println("JPA核心包生成失败！");
             e.printStackTrace();

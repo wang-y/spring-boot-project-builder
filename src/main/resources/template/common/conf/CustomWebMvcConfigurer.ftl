@@ -24,17 +24,6 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     @Value("${allowed_cross_domain}")
     private boolean allowedCrossDomain;
 
-    @Bean
-    public FilterRegistrationBean characterEncodingFilter() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-        characterEncodingFilter.setEncoding("UTF-8");
-        characterEncodingFilter.setForceEncoding(true);
-        filterRegistrationBean.setFilter(characterEncodingFilter);
-        filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE-1);
-        return filterRegistrationBean;
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         if (allowedCrossDomain) {

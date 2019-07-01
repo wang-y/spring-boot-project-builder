@@ -23,7 +23,7 @@ spring:
   datasource:
     <#switch databaseType>
         <#case "MYSQL">
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
         <#break>
         <#case "SQLSERVER">
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

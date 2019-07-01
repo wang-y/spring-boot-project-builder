@@ -62,11 +62,47 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <#break>
-        <#case "SQLSERVER">
+        <#case "SQL_SERVER">
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
+        <#break>
+        <#case "MARIADB">
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+            </dependency>
+        <#break>
+        <#case "ORACLE">
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc14</artifactId>
+            </dependency>
+        <#break>
+        <#case "DB2">
+            <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc</artifactId>
+            </dependency>
+        <#break>
+        <#case "H2">
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+            </dependency>
+        <#break>
+        <#case "SQLITE">
+            <dependency>
+                <groupId>org.xerial</groupId>
+                <artifactId>sqlite-jdbc</artifactId>
+            </dependency>
+        <#break>
+        <#case "POSTGRE_SQL">
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+            </dependency>
         <#break>
     </#switch>
 
@@ -120,9 +156,15 @@
     </#switch>
         <!-- 代码生成依赖 -->
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.28</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>3.1.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.1</version>
             <scope>test</scope>
         </dependency>
 </#if>

@@ -9,9 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.wymix.project.core.constant.DataBaseType.*;
 
 public final class CodeBuilder {
 
@@ -103,7 +106,7 @@ public final class CodeBuilder {
                     createJPAConf();
                     break;
             }
-//            createTemplateCode();
+             createGenertor();
         }
         if (projectConfig.enable_swagger) {
             createSwaggerConf();
@@ -111,8 +114,86 @@ public final class CodeBuilder {
         if(projectConfig.enable_docker){
             createDockerfile();
         }
+        createGenertor();
         createBanner();
         System.out.println("项目创建完毕！");
+    }
+
+    private void createGenertor() {
+        try {
+            freemarker.template.Configuration cfg = getConfiguration();
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("artifactId", this.projectConfig.project);
+            if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
+                data.put("basePackage", BASE_PACKAGE);
+                data.put("enabledSwagger", projectConfig.enable_swagger);
+                data.put("JDBC_URL", this.projectConfig.dataBaseConfig.getJdbc_url());
+                data.put("JDBC_USERNAME", this.projectConfig.dataBaseConfig.getUser());
+                data.put("JDBC_PASSWORD", this.projectConfig.dataBaseConfig.getPassword());
+                switch (this.projectConfig.dataBaseConfig.getDataBaseType()){
+                    case MYSQL:
+                        data.put("DRIVER_CLASS_NAME", MYSQL.getDriverClassName());
+                        data.put("DBTYPE", "MYSQL");
+                        break;
+                    case MARIADB:
+                        data.put("DRIVER_CLASS_NAME", MARIADB.getDriverClassName());
+                        data.put("DBTYPE", "SQL_SERVER");
+                        break;
+                    case ORACLE:
+                        data.put("DRIVER_CLASS_NAME", ORACLE.getDriverClassName());
+                        data.put("DBTYPE", "ORACLE");
+                        break;
+                    case DB2:
+                        data.put("DRIVER_CLASS_NAME", DB2.getDriverClassName());
+                        data.put("DBTYPE", "DB2");
+                        break;
+                    case H2:
+                        data.put("DRIVER_CLASS_NAME", H2.getDriverClassName());
+                        data.put("DBTYPE", "H2");
+                        break;
+                    case SQLITE:
+                        data.put("DRIVER_CLASS_NAME", SQLITE.getDriverClassName());
+                        data.put("DBTYPE", "SQLITE");
+                        break;
+                    case POSTGRE_SQL:
+                        data.put("DRIVER_CLASS_NAME", POSTGRE_SQL.getDriverClassName());
+                        data.put("DBTYPE", "POSTGRE_SQL");
+                        break;
+                    case SQL_SERVER:
+                        data.put("DRIVER_CLASS_NAME", SQL_SERVER.getDriverClassName());
+                        data.put("DBTYPE", "SQL_SERVER");
+                        break;
+                }
+
+                File file = new File(getTestJavaPath() + BASE_PACKAGE_PATH+"Generator.java");
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                cfg.getTemplate("generator/m_Generator.ftl").process(data, new FileWriter(file));
+
+                String projectPath = System.getProperty("user.dir")+"/src/main/resources/template/generator/m_vm";
+                File source=new File(projectPath);
+                File[] files = source.listFiles();
+                for (File vm : files) {
+                    File temp = new File(getRoot() + "/src/main/resources/templates/" + vm.getName());
+                    if(!temp.getParentFile().exists()){
+                        temp.getParentFile().mkdir();
+                    }
+                    try {
+                        Files.copy(vm.toPath(), temp.toPath());
+                    }catch (FileAlreadyExistsException alreadyExistsException){
+
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Dockerfile生成失败！");
+            e.printStackTrace();
+            deleteProject();
+        }
+        System.out.println("Dockerfile生成完毕！");
     }
 
     private void createDockerfile() {
@@ -230,123 +311,6 @@ public final class CodeBuilder {
             deleteProject();
         }
         System.out.println("banner生成完毕！");
-    }
-
-    private void createTemplateCode() {
-        String jdbc_driver = "";
-        if (projectConfig.dataBaseConfig != null && projectConfig.dataBaseConfig.getDataBaseType() != DataBaseType.NONE) {
-            switch (projectConfig.dataBaseConfig.getDataBaseType()) {
-                case MYSQL:
-                    jdbc_driver += "com.mysql.jdbc.Driver";
-                    break;
-                case SQLSERVER:
-                    jdbc_driver += "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-                    break;
-            }
-        }
-
-        try {
-            freemarker.template.Configuration cfg = getConfiguration();
-
-            Map<String, Object> data = new HashMap<>();
-
-            if (projectConfig.dataBaseConfig.getOrmType() == OrmType.JPA) {
-                data.put("businesspackage", PACKAGE_BUSINESS);
-                data.put("corepackage", PACKAGE_CORE);
-
-                data.put("modelName", "${modelName}");
-                data.put("PKType", "${PKType}");
-
-                File file = new File(getTestResourcesPath() + "generator/template/repository/TemplateRepository.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("jpa/business/repository/TemplateRepository.ftl").process(data, new FileWriter(file));
-
-                file = new File(getTestResourcesPath() + "generator/template/service/TemplateService.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("jpa/business/service/TemplateService.ftl").process(data, new FileWriter(file));
-
-                file = new File(getTestResourcesPath() + "generator/template/service/impl/TemplateServiceImpl.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("jpa/business/service/impl/TemplateServiceImpl.ftl").process(data, new FileWriter(file));
-
-                data.put("baseRequestMapping", "${baseRequestMapping?lower_case}");
-                file = new File(getTestResourcesPath() + "generator/template/web/TemplateController.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("jpa/business/web/TemplateController.ftl").process(data, new FileWriter(file));
-
-                data = new HashMap<>();
-                data.put("basepackage", BASE_PACKAGE);
-                data.put("database_user", projectConfig.dataBaseConfig.getUser());
-                data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
-                data.put("database_url", projectConfig.dataBaseConfig.getJdbc_url());
-                data.put("businesspackage", PACKAGE_BUSINESS);
-                data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
-                data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
-                data.put("jdbc_diver_class_name", jdbc_driver);
-
-                file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("gen/JPA_CodeGenerator.ftl").process(data, new FileWriter(file));
-            } else if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
-                data.put("basePackage", BASE_PACKAGE);
-                data.put("modelNameUpperCamel", "${modelNameUpperCamel}");
-                data.put("modelNameLowerCamel", "${modelNameLowerCamel}");
-                data.put("IDType", "${IDType}");
-                data.put("enabledSwagger", projectConfig.enable_swagger);
-                data.put("baseRequestMapping", "${baseRequestMapping}");
-
-                File file = new File(getTestResourcesPath() + "generator/template/service/service.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("mybatis/business/service/service.ftl").process(data, new FileWriter(file));
-
-                file = new File(getTestResourcesPath() + "generator/template/service/impl/service-impl.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("mybatis/business/service/service-impl.ftl").process(data, new FileWriter(file));
-
-                file = new File(getTestResourcesPath() + "generator/template/web/controller.ftl");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("mybatis/business/web/controller.ftl").process(data, new FileWriter(file));
-
-                data = new HashMap<>();
-                data.put("basepackage", BASE_PACKAGE);
-                data.put("corepackage", PACKAGE_CORE);
-
-                data.put("database_url", projectConfig.dataBaseConfig.getJdbc_url());
-                data.put("database_user", projectConfig.dataBaseConfig.getUser());
-                data.put("database_passowrd", projectConfig.dataBaseConfig.getPassword());
-
-                data.put("enabled_swagger", projectConfig.enable_swagger ? "yes" : "no");
-                data.put("databasetype", projectConfig.dataBaseConfig.getDataBaseType().toString());
-                data.put("jdbc_diver_class_name", jdbc_driver);
-
-                file = new File(getTestJavaPath() + BASE_PACKAGE_PATH + "CodeGenerator.java");
-                if (!file.getParentFile().exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                cfg.getTemplate("gen/MYBATIS_CodeGenerator.ftl").process(data, new FileWriter(file));
-            }
-        } catch (Exception e) {
-            System.out.println("代码生成器类创建失败！");
-            e.printStackTrace();
-            deleteProject();
-        }
-        System.out.println("代码生成器类创建完毕！");
     }
 
     private void createSwaggerConf() {
@@ -751,6 +715,7 @@ public final class CodeBuilder {
             data.put("artifactId", this.projectConfig.project);
             data.put("enableDatabase", !this.projectConfig.dataBaseConfig.getDataBaseType().equals(DataBaseType.NONE));
             data.put("databaseType", this.projectConfig.dataBaseConfig.getDataBaseType().toString());
+            data.put("driverClassName", this.projectConfig.dataBaseConfig.getDataBaseType().getDriverClassName());
             data.put("ormType", this.projectConfig.dataBaseConfig.getOrmType().toString());
             data.put("databaseConnectPool", this.projectConfig.dataBaseConfig.getDataBaseConnectPool().toString());
 

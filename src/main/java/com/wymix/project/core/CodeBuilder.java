@@ -720,6 +720,7 @@ public final class CodeBuilder {
 
             data.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
             data.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
+            data.put("MYBATIS_PLUS_VERSION", VersionConstants.DRUID_VERSION);
 
             data.put("dockerimageprefix","${docker.image.prefix}");
             data.put("projectartifactId","${project.artifactId}");

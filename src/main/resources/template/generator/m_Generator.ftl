@@ -56,7 +56,7 @@ public class Generator {
         packageConfig.setServiceImpl("service.impl");
         packageConfig.setMapper("repository");
         packageConfig.setController("web");
-        packageConfig.setXml("mapper");
+        packageConfig.setXml("repository.mapper");
         mpg.setPackageInfo(packageConfig);
 
 

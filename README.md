@@ -14,6 +14,8 @@ https://github.com/wang-y/spring-boot-project-builder/releases/latest
 
 **本项目支持 MYSQL、SQL_SERVER、MARIADB、ORACLE、DB2、POSTGRE_SQL、SQLITE、H2 数据库**
 
+**注：Oracle 及 DB2 因商业软件问题，驱动未开源，需要手动设置maven依赖**
+
 在生成的代码中
 
 src/test/java/com/company/project/Generator

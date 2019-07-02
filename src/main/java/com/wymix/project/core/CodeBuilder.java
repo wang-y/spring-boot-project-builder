@@ -172,11 +172,11 @@ public final class CodeBuilder {
         try {
             if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
                 generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/m_Generator.ftl");
-                String projectPath = System.getProperty("user.dir") + "/src/main/resources/template/generator/m_vm";
+                String projectPath = PROJECT_PATH + "/src/main/resources/template/generator/m_vm";
                 copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
             } else {
                 generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/j_Generator.ftl");
-                String projectPath = System.getProperty("user.dir") + "/src/main/resources/template/generator/j_vm";
+                String projectPath = PROJECT_PATH + "/src/main/resources/template/generator/j_vm";
                 copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
             }
         } catch (Exception e) {

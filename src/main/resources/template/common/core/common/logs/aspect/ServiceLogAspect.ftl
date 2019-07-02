@@ -1,13 +1,12 @@
 package ${corepackage}.common.logs.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import ${corepackage}.common.logs.annotations.ServiceLog;
 import ${corepackage}.common.logs.utils.LogAspectUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -16,11 +15,10 @@ import java.lang.reflect.Method;
  * Description:
  * service 日志记录切面
  */
+@Slf4j
 @Aspect
 @Component
 public class ServiceLogAspect {
-
-    private final Logger logger = LoggerFactory.getLogger(ServiceLogAspect.class);
 
     /**
      * 环绕通知方法
@@ -46,14 +44,16 @@ public class ServiceLogAspect {
         if (!method.isAnnotationPresent(ServiceLog.class)) {
             return joinPoint.proceed();
         }
+        ServiceLog serviceLog = method.getDeclaredAnnotation(ServiceLog.class);
+
         String methodParams = LogAspectUtil.getMethodParams(joinPoint);
-        logger.debug("开始请求方法:[{}] 参数:[{}]", methodName, methodParams);
+        log.debug("开始请求方法:[{}] 描述[{}] 参数:[{}]", serviceLog.description(), methodName, methodParams);
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long end = System.currentTimeMillis();
         String deleteSensitiveContent =  LogAspectUtil.convertObj2Str(result);
-        logger.debug("结束请求方法:[{}] 参数:[{}] 返回结果[{}] 耗时:[{}]毫秒 ",
-                methodName, methodParams, deleteSensitiveContent, end - start);
+        log.debug("结束请求方法:[{}] 描述[{}] 参数:[{}] 返回结果[{}] 耗时:[{}]毫秒 ",
+                methodName, serviceLog.description(), methodParams, deleteSensitiveContent, end - start);
         return result;
     }
 

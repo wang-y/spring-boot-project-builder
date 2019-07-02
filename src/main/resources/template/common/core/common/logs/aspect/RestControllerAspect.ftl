@@ -1,27 +1,23 @@
 package ${corepackage}.common.logs.aspect;
 
-import ${corepackage}.common.exception.GlobalExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 import ${corepackage}.common.logs.utils.IpUtil;
 import ${corepackage}.common.logs.utils.LogAspectUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 
+@Slf4j
 @Aspect
 @Component
 public class RestControllerAspect {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 环绕通知
@@ -41,12 +37,12 @@ public class RestControllerAspect {
         String methodName = this.getMethodName(joinPoint);
         String params = LogAspectUtil.getMethodParams(joinPoint);
 
-        logger.debug("开始请求方法:[{}] 参数:[{}] IP:[{}] userAgent [{}]", methodName, params, ip, userAgent);
+        log.debug("开始请求方法:[{}] 参数:[{}] IP:[{}] userAgent [{}]", methodName, params, ip, userAgent);
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long end = System.currentTimeMillis();
         String deleteSensitiveContent =  LogAspectUtil.convertObj2Str(result);
-        logger.debug("结束请求方法:[{}] 参数:[{}] 返回结果[{}] 耗时:[{}]毫秒 ",
+        log.debug("结束请求方法:[{}] 参数:[{}] 返回结果[{}] 耗时:[{}]毫秒 ",
                  methodName, params, deleteSensitiveContent, end - start);
         return result;
     }

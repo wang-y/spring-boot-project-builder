@@ -128,9 +128,9 @@ public final class CodeBuilder {
         modelData.put("corepackage", PACKAGE_CORE);
 
         modelData.put("enabledSwagger", projectConfig.enable_swagger);
-        modelData.put("JDBC_URL", this.projectConfig.dataBaseConfig.getJdbc_url());
-        modelData.put("JDBC_USERNAME", this.projectConfig.dataBaseConfig.getUser());
-        modelData.put("JDBC_PASSWORD", this.projectConfig.dataBaseConfig.getPassword());
+        modelData.put("jdbcurl", this.projectConfig.dataBaseConfig.getJdbc_url());
+        modelData.put("username", this.projectConfig.dataBaseConfig.getUser());
+        modelData.put("password", this.projectConfig.dataBaseConfig.getPassword());
         modelData.put("artifactId", this.projectConfig.project);
         modelData.put("allowed_cross_domain","${server.allowed-cross-domain}");
 
@@ -158,45 +158,9 @@ public final class CodeBuilder {
         modelData.put("driverClassName", this.projectConfig.dataBaseConfig.getDataBaseType().getDriverClassName());
         modelData.put("ormType", this.projectConfig.dataBaseConfig.getOrmType().toString());
 
-        modelData.put("jdbcurl", this.projectConfig.dataBaseConfig.getJdbc_url());
-        modelData.put("username", this.projectConfig.dataBaseConfig.getUser());
-        modelData.put("password", this.projectConfig.dataBaseConfig.getPassword());
-
         if(this.projectConfig.dataBaseConfig.getDataBaseType()!=NONE) {
-            switch (this.projectConfig.dataBaseConfig.getDataBaseType()) {
-                case MYSQL:
-                    modelData.put("DRIVER_CLASS_NAME", MYSQL.getDriverClassName());
-                    modelData.put("DBTYPE", "MYSQL");
-                    break;
-                case MARIADB:
-                    modelData.put("DRIVER_CLASS_NAME", MARIADB.getDriverClassName());
-                    modelData.put("DBTYPE", "SQL_SERVER");
-                    break;
-                case ORACLE:
-                    modelData.put("DRIVER_CLASS_NAME", ORACLE.getDriverClassName());
-                    modelData.put("DBTYPE", "ORACLE");
-                    break;
-                case DB2:
-                    modelData.put("DRIVER_CLASS_NAME", DB2.getDriverClassName());
-                    modelData.put("DBTYPE", "DB2");
-                    break;
-                case H2:
-                    modelData.put("DRIVER_CLASS_NAME", H2.getDriverClassName());
-                    modelData.put("DBTYPE", "H2");
-                    break;
-                case SQLITE:
-                    modelData.put("DRIVER_CLASS_NAME", SQLITE.getDriverClassName());
-                    modelData.put("DBTYPE", "SQLITE");
-                    break;
-                case POSTGRE_SQL:
-                    modelData.put("DRIVER_CLASS_NAME", POSTGRE_SQL.getDriverClassName());
-                    modelData.put("DBTYPE", "POSTGRE_SQL");
-                    break;
-                case SQL_SERVER:
-                    modelData.put("DRIVER_CLASS_NAME", SQL_SERVER.getDriverClassName());
-                    modelData.put("DBTYPE", "SQL_SERVER");
-                    break;
-            }
+                    modelData.put("DRIVER_CLASS_NAME",this.projectConfig.dataBaseConfig.getDataBaseType().getDriverClassName());
+                    modelData.put("DBTYPE", this.projectConfig.dataBaseConfig.getDataBaseType().toString());
         }
     }
 

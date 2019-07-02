@@ -11,9 +11,9 @@ import java.util.Map;
 
 public class Generator {
 
-    private final static String JDBC_URL="${JDBC_URL}";
-    private final static String JDBC_USERNAME="${JDBC_USERNAME}";
-    private final static String JDBC_PASSWORD="${JDBC_PASSWORD}";
+    private final static String JDBC_URL="${jdbcurl}";
+    private final static String JDBC_USERNAME="${username}";
+    private final static String JDBC_PASSWORD="${password}";
     private final static String DRIVER_CLASS_NAME="${DRIVER_CLASS_NAME}";
 
     public static void main(String[] args) {

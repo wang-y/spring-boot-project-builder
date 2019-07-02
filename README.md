@@ -15,6 +15,7 @@ https://github.com/wang-y/spring-boot-project-builder/releases/latest
 **本项目支持 MYSQL、SQL_SERVER、MARIADB、ORACLE、DB2、POSTGRE_SQL、SQLITE、H2 数据库**
 
 **注：Oracle 及 DB2 因商业软件问题，驱动未开源，需要手动设置maven依赖**
+
 **注：使用SQLITE数据库时，如果使用JPA作为ORM，因Hibernater无对应Dialect，需要手动创建SqliteDialect**
 
 在生成的代码中

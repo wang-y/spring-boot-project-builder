@@ -3,8 +3,8 @@
           xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
     <id>make-assembly</id>
     <formats>
-        <format>linux.tar.gz</format>
-        <format>win.zip</format>
+        <format>tar.gz</format>
+        <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
 

@@ -29,15 +29,15 @@ public class Main {
 
 
     private static void buildProject() {
-        ProjectConfig projectConfig = ProjectConfig.project("test").org()
+        ProjectConfig projectConfig = ProjectConfig.project("testmyb").org()
                 .name("wymix")
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
-                .JDBCconfigure("jdbc:mysql://10.30.0.11:3306/testf", "root", "ori18502800930")
-                .setOrmType(OrmType.JPA)
+                .JDBCconfigure("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC", "root", "123456")
+                .setOrmType(OrmType.MYBATIS)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP).enableDocker();
 
-        CodeBuilder.toFilePath("/home/wymix/workspaces/study_diary_workspaces").build(projectConfig);
+        CodeBuilder.toFilePath("C:\\MySoft\\project").build(projectConfig);
     }
 
 
@@ -159,7 +159,7 @@ public class Main {
             } else if (StringUtils.equals(num, "1")) {
                 dataTpe = DataBaseType.MYSQL;
             } else if (StringUtils.equals(num, "2")) {
-                dataTpe = DataBaseType.SQLSERVER;
+                dataTpe = DataBaseType.SQL_SERVER;
             }
         }
         DataBaseConfig dataBaseConfig = projectConfig.setDataBaseType(dataTpe);

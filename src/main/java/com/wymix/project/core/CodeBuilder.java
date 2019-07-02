@@ -20,7 +20,8 @@ import static com.wymix.project.core.constant.DataBaseType.NONE;
 public final class CodeBuilder {
 
     private static final String PROJECT_PATH = System.getProperty("user.dir");//项目在硬盘上的基础路径
-    private static final String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/main/resources/template";//模板位置
+    private static String TEMPLATE_FILE_PATH = PROJECT_PATH + "/src/main/resources/template";//模板位置
+    private static String VM_FILE_PATH = PROJECT_PATH + "/src/main/resources/template/generator/";//模板位置
 
     private Map<String, Object> modelData = new HashMap<>();
 
@@ -35,6 +36,12 @@ public final class CodeBuilder {
     private String PACKAGE_CONF;
     private String PACKAGE_CORE;
     private String BASE_PACKAGE;
+
+    public CodeBuilder cmd(){
+        TEMPLATE_FILE_PATH=PROJECT_PATH+"/../template";
+        VM_FILE_PATH=PROJECT_PATH+"/../template/generator/";
+        return this;
+    }
 
     private static freemarker.template.Configuration getConfiguration() throws IOException {
         freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_23);
@@ -108,7 +115,6 @@ public final class CodeBuilder {
         if (projectConfig.enable_docker) {
             createDockerfile();
         }
-        createGenertor();
         createBanner();
         System.out.println("项目创建完毕！");
     }
@@ -172,11 +178,11 @@ public final class CodeBuilder {
         try {
             if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
                 generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/m_Generator.ftl");
-                String projectPath = PROJECT_PATH + "/src/main/resources/template/generator/m_vm";
+                String projectPath = VM_FILE_PATH + "m_vm";
                 copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
             } else {
                 generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/j_Generator.ftl");
-                String projectPath = PROJECT_PATH + "/src/main/resources/template/generator/j_vm";
+                String projectPath = VM_FILE_PATH + "j_vm";
                 copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
             }
         } catch (Exception e) {

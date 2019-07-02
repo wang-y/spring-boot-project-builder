@@ -249,7 +249,7 @@ public class Main {
 
 
         System.out.println("开始构建 [" + project + "] 项目...");
-        CodeBuilder.toFilePath(path).build(projectConfig);
+        CodeBuilder.toFilePath(path).cmd().build(projectConfig);
         System.out.println("构建 [" + project + "] 项目完毕！");
         System.out.println("请前往目录 [" + path + "] 下查看项目！");
     }

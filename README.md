@@ -6,9 +6,10 @@
 
 https://github.com/wang-y/spring-boot-project-builder/releases/latest
 
-下载完成后 运行命令
+下载完成后 解压zip/tar.gz 在 bin/ 目录下 运行命令
 ```
-# java -jar spring-boot-project-builder.jar
+# windows: create.bat
+# linux:   create.sh
 ```
 根据引导一步步输入信息即可快速生成 spring boot 项目代码
 

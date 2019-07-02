@@ -3,8 +3,10 @@ package ${corepackage}.common.body;
 import io.swagger.annotations.ApiModelProperty;
 </#if>
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PageRequest extends PostRequest {
 <#if enabledSwagger>
     @ApiModelProperty(value = "页码",example = "1")

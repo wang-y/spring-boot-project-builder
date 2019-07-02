@@ -23,9 +23,7 @@ public class Generator {
     private static void generate(String table,String idType){
         AutoGenerator mpg = new AutoGenerator();
 
-
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
-
         dataSourceConfig.setDbType(DbType.${DBTYPE});
         dataSourceConfig.setUrl(JDBC_URL);
         dataSourceConfig.setUsername(JDBC_USERNAME);
@@ -43,7 +41,6 @@ public class Generator {
 </#if>
         gc.setEntityName("%s");
         gc.setMapperName("I%sRepository");
-        gc.setXmlName("%sRepository");
         gc.setServiceName("I%sService");
         gc.setServiceImplName("%sServiceImpl");
         gc.setControllerName("%sController");
@@ -56,7 +53,7 @@ public class Generator {
         packageConfig.setServiceImpl("service.impl");
         packageConfig.setMapper("repository");
         packageConfig.setController("web");
-        packageConfig.setXml("mapper");
+        packageConfig.setXml(null);
         mpg.setPackageInfo(packageConfig);
 
 
@@ -65,6 +62,7 @@ public class Generator {
         strategy.setNaming(NamingStrategy.underline_to_camel);
         strategy.setColumnNaming(NamingStrategy.underline_to_camel);
         strategy.setEntityLombokModel(true);
+        strategy.setSuperMapperClass("${basePackage}.core.repository.IRepository");
         strategy.setSuperServiceClass("${basePackage}.core.service.IService");
         strategy.setSuperServiceImplClass("${basePackage}.core.service.impl.ServiceImpl");
         strategy.setSuperControllerClass("${basePackage}.core.web.CommonController");
@@ -83,6 +81,9 @@ public class Generator {
         mpg.setCfg(cfg);
 
         TemplateConfig templateConfig = new TemplateConfig();
+        templateConfig.setXml(null);
+        templateConfig.setEntity("templates/entity.java");
+        templateConfig.setMapper("templates/mapper.java");
         templateConfig.setService("templates/service.java");
         templateConfig.setServiceImpl("templates/serviceImpl.java");
         templateConfig.setController("templates/controller.java");

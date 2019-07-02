@@ -2,9 +2,11 @@ package ${corepackage}.common.exception;
 
 import ${corepackage}.common.result.ResultCode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.util.StringUtils;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class BusinessException extends RuntimeException {
     private static final long serialVersionUID = 2332608236621015980L;
 

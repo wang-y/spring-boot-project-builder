@@ -505,6 +505,7 @@ public class RepositoryImpl<E, ID extends Serializable> extends SimpleJpaReposit
 
     @SuppressWarnings({"unchecked"})
     @Override
+    @Deprecated
     public List<Map<String, Object>> findAllBySql(String sql, Object... value) {
         Query query = this.entityManager.createNativeQuery(sql);
 
@@ -523,6 +524,7 @@ public class RepositoryImpl<E, ID extends Serializable> extends SimpleJpaReposit
 
     @SuppressWarnings({"unchecked"})
     @Override
+    @Deprecated
     public Map<String, Object> findOneBySql(String sql, Object... value) {
         Query query = this.entityManager.createNativeQuery(sql);
 

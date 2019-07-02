@@ -29,12 +29,12 @@ public class Main {
 
 
     private static void buildProject() {
-        ProjectConfig projectConfig = ProjectConfig.project("testmyb").org()
+        ProjectConfig projectConfig = ProjectConfig.project("test").org()
                 .name("wymix")
                 .enableSwagger()
                 .setDataBaseType(DataBaseType.MYSQL)
                 .JDBCconfigure("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC", "root", "123456")
-                .setOrmType(OrmType.MYBATIS)
+                .setOrmType(OrmType.JPA)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP).enableDocker();
 
         CodeBuilder.toFilePath("C:\\MySoft\\project").build(projectConfig);

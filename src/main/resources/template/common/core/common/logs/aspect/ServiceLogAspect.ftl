@@ -47,7 +47,7 @@ public class ServiceLogAspect {
         ServiceLog serviceLog = method.getDeclaredAnnotation(ServiceLog.class);
 
         String methodParams = LogAspectUtil.getMethodParams(joinPoint);
-        log.debug("开始请求方法:[{}] 描述[{}] 参数:[{}]", serviceLog.description(), methodName, methodParams);
+        log.debug("开始请求方法:[{}] 描述[{}] 参数:[{}]", methodName, serviceLog.description(), methodParams);
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long end = System.currentTimeMillis();

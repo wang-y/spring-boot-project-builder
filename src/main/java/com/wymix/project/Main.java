@@ -150,6 +150,12 @@ public class Main {
         System.out.println("    0. None");
         System.out.println("    1. MySQL");
         System.out.println("    2. SQL Server");
+        System.out.println("    3. MARIADB");
+        System.out.println("    4. ORACLE");
+        System.out.println("    5. DB2");
+        System.out.println("    6. POSTGRESQL");
+        System.out.println("    7. SQLITE");
+        System.out.println("    8. H2");
         System.out.print("请选择数据库类型序号(默认不使用数据库)：");
         String num = scanner.nextLine();
         DataBaseType dataTpe = DataBaseType.NONE;
@@ -160,6 +166,18 @@ public class Main {
                 dataTpe = DataBaseType.MYSQL;
             } else if (StringUtils.equals(num, "2")) {
                 dataTpe = DataBaseType.SQL_SERVER;
+            }else if (StringUtils.equals(num, "3")) {
+                dataTpe = DataBaseType.MARIADB;
+            } else if (StringUtils.equals(num, "4")) {
+                dataTpe = DataBaseType.ORACLE;
+            }else if (StringUtils.equals(num, "5")) {
+                dataTpe = DataBaseType.DB2;
+            } else if (StringUtils.equals(num, "6")) {
+                dataTpe = DataBaseType.POSTGRE_SQL;
+            }else if (StringUtils.equals(num, "7")) {
+                dataTpe = DataBaseType.SQLITE;
+            } else if (StringUtils.equals(num, "8")) {
+                dataTpe = DataBaseType.H2;
             }
         }
         DataBaseConfig dataBaseConfig = projectConfig.setDataBaseType(dataTpe);

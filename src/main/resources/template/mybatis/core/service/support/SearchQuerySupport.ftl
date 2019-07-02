@@ -112,7 +112,7 @@ public final class SearchQuerySupport {
                         wrapper.le(fieldName, v);
                     } else if (k.endsWith("_in")) {
                         if (v instanceof String) {
-                            String[] array = ((String) v).split(",");
+                            Object[] array = ((String) v).split(",");
                             wrapper.in(fieldName, array);
                         } else if (v instanceof List) {
                             List<Object> list = (List<Object>) v;
@@ -123,7 +123,7 @@ public final class SearchQuerySupport {
                         }
                     } else if (k.endsWith("_notin")) {
                         if (v instanceof String) {
-                            String[] array = ((String) v).split(",");
+                            Object[] array = ((String) v).split(",");
                             wrapper.notIn(fieldName, array);
                         } else if (v instanceof List) {
                             List<Object> list = (List<Object>) v;

@@ -123,6 +123,10 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${MYBATIS_PLUS_VERSION}</version>
         </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
         <#break>
         <#default>
         <dependency>

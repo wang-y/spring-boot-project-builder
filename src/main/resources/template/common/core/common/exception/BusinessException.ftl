@@ -24,8 +24,11 @@ public class BusinessException extends RuntimeException {
             resultCode = exceptionEnum.getResultCode();
             code = exceptionEnum.getResultCode().code().toString();
             message = exceptionEnum.getResultCode().message();
+        }else{
+            this.resultCode = ResultCode.SYSTEM_INNER_ERROR;
+            this.code = resultCode.code().toString();
+            this.message = resultCode.message();
         }
-
     }
 
     public BusinessException(String message) {

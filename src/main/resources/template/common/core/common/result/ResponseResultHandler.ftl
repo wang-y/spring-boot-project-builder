@@ -33,7 +33,8 @@ public class ResponseResultHandler implements ResponseBodyAdvice<Object> {
                         .data(defaultErrorResult.getErrors())
                         .build();
             }
-            if (body instanceof String && MediaType.APPLICATION_JSON.includes(selectedContentType)) {
+            if (returnType.getGenericParameterType().getTypeName().equals("java.lang.String") ) {
+                RequestContextHolderUtil.getResponse().setContentType(MediaType.APPLICATION_JSON_VALUE);
                 return PlatformResult.success(body).toString();
             }
             return PlatformResult.success(body);

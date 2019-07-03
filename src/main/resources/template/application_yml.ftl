@@ -41,6 +41,12 @@ spring:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    <#if databaseType == "POSTGRE_SQL">
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+    </#if>
       <#else>
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml

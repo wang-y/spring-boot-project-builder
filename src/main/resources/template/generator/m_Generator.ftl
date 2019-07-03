@@ -1,12 +1,16 @@
 package ${basePackage};
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Generator {
@@ -43,7 +47,6 @@ public class Generator {
 </#if>
         gc.setEntityName("%s");
         gc.setMapperName("I%sRepository");
-        gc.setXmlName("%sRepository");
         gc.setServiceName("I%sService");
         gc.setServiceImplName("%sServiceImpl");
         gc.setControllerName("%sController");
@@ -56,7 +59,6 @@ public class Generator {
         packageConfig.setServiceImpl("service.impl");
         packageConfig.setMapper("repository");
         packageConfig.setController("web");
-        packageConfig.setXml("repository.mapper");
         mpg.setPackageInfo(packageConfig);
 
 
@@ -80,12 +82,22 @@ public class Generator {
                 this.setMap(map);
             }
         };
+        List<FileOutConfig> focList = new ArrayList<>();
+        focList.add(new FileOutConfig("/templates/mapper.xml.vm") {
+            @Override
+            public String outputFile(TableInfo tableInfo) {
+                // 自定义输入文件名称
+                return projectPath + "/src/main/resources/mapper/" + tableInfo.getEntityName() + "Repository" + StringPool.DOT_XML;
+            }
+        });
+        cfg.setFileOutConfigList(focList);
         mpg.setCfg(cfg);
 
         TemplateConfig templateConfig = new TemplateConfig();
         templateConfig.setService("templates/service.java");
         templateConfig.setServiceImpl("templates/serviceImpl.java");
         templateConfig.setController("templates/controller.java");
+        templateConfig.setXml(null);
         mpg.setTemplate(templateConfig);
         mpg.setStrategy(strategy);
         mpg.execute();

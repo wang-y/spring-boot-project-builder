@@ -41,6 +41,9 @@ spring:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      <#else>
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
     </#if>
 </#if>
 logging:

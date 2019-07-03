@@ -8,13 +8,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import javax.persistence.*;
 
 /**
  * <p>
@@ -53,9 +49,12 @@ public class ${entity} implements Serializable {
 #end
 #if(${field.keyFlag})
 ## 主键
-#if(${field.keyIdentityFlag})
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+#if(${field.keyIdentityFlag})
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+#else
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "${table.name}_${field.name}_seq_generator")
+    @SequenceGenerator(name = "${table.name}_${field.name}_seq_generator",sequenceName = "${table.name}_${field.name}_seq",allocationSize = 1,initialValue = 1)
 #end
 #end
     @Column(name = "${field.name}")

@@ -1,5 +1,6 @@
 FROM java:8
 VOLUME /tmp
-ADD ${artifactId}.jar app.jar
-RUN bash -c 'touch /app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+ADD ${artifactId}.jar application.jar
+RUN bash -c 'touch /application.jar'
+ENTRYPOINT ["exec ","java","$JAVA_OPTS","-Djava.security.egd=file:/dev/./urandom","-jar","/application.jar"]
+EXPOSE ${port}

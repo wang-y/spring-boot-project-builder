@@ -51,112 +51,116 @@ public final class SearchQuerySupport {
     static <T> QueryWrapper<T> buildOrderWrapper(LinkedHashMap<String, String> orderBy, QueryWrapper<T> wrapper, Class<T> tClass) {
         List<String> ascList = new ArrayList<>();
         List<String> descList = new ArrayList<>();
-        orderBy.forEach((k, v) -> {
-            try {
-                String fieldName = k;
-                Field field = tClass.getDeclaredField(k);
-                if (field != null) {
-                    TableId tableId = field.getDeclaredAnnotation(TableId.class);
-                    if (tableId != null) {
-                        fieldName = tableId.value();
+        if(orderBy!=null) {
+            orderBy.forEach((k, v) -> {
+                try {
+                    String fieldName = k;
+                    Field field = tClass.getDeclaredField(k);
+                    if (field != null) {
+                        TableId tableId = field.getDeclaredAnnotation(TableId.class);
+                        if (tableId != null) {
+                            fieldName = tableId.value();
+                        }
+                        TableField tableField = field.getDeclaredAnnotation(TableField.class);
+                        if (tableField != null) {
+                            fieldName = tableField.value();
+                        }
+                        if ("ASC".equalsIgnoreCase(v)) {
+                            ascList.add(fieldName);
+                        } else {
+                            descList.add(fieldName);
+                        }
                     }
-                    TableField tableField = field.getDeclaredAnnotation(TableField.class);
-                    if (tableField != null) {
-                        fieldName = tableField.value();
-                    }
-                    if ("ASC".equalsIgnoreCase(v)) {
-                        ascList.add(fieldName);
-                    } else {
-                        descList.add(fieldName);
-                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
                 }
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+            });
+            if (!ascList.isEmpty()) {
+                wrapper.orderByAsc(ascList.toArray(new String[]{}));
             }
-        });
-        if (!ascList.isEmpty()) {
-            wrapper.orderByAsc(ascList.toArray(new String[]{}));
-        }
-        if (!descList.isEmpty()) {
-            wrapper.orderByDesc(descList.toArray(new String[]{}));
+            if (!descList.isEmpty()) {
+                wrapper.orderByDesc(descList.toArray(new String[]{}));
+            }
         }
         return wrapper;
     }
 
     static <T> QueryWrapper<T> builderQueryWrapper(HashMap<String, Object> queryParams, Class<T> tClass) {
         QueryWrapper<T> wrapper = new QueryWrapper<>();
-        queryParams.forEach((k, v) -> {
-            String fieldName = replaceAllSuffix(k);
-            try {
-                Field field = tClass.getDeclaredField(fieldName);
-                if (field != null) {
-                    TableId tableId = field.getDeclaredAnnotation(TableId.class);
-                    if (tableId != null) {
-                        fieldName = tableId.value();
-                    }
-                    TableField tableField = field.getDeclaredAnnotation(TableField.class);
-                    if (tableField != null) {
-                        fieldName = tableField.value();
-                    }
-                    if (k.endsWith("_lessThan")) {
-                        wrapper.lt(fieldName, v);
-                    } else if (k.endsWith("_greaterThan")) {
-                        wrapper.gt(fieldName, v);
-                    } else if (k.endsWith("_lessOrEq")) {
-                        wrapper.le(fieldName, v);
-                    } else if (k.endsWith("_greaterOrEq")) {
-                        wrapper.ge(fieldName, v);
-                    } else if (k.endsWith("_start")) {
-                        wrapper.ge(fieldName, v);
-                    } else if (k.endsWith("_end")) {
-                        wrapper.le(fieldName, v);
-                    } else if (k.endsWith("_in")) {
-                        if (v instanceof String) {
-                            Object[] array = ((String) v).split(",");
-                            wrapper.in(fieldName, array);
-                        } else if (v instanceof List) {
-                            List<Object> list = (List<Object>) v;
-                            wrapper.in(fieldName, list);
-                        } else if (v.getClass().isArray()) {
-                            Object[] array = (Object[]) v;
-                            wrapper.in(fieldName, array);
+        if (queryParams != null) {
+            queryParams.forEach((k, v) -> {
+                String fieldName = replaceAllSuffix(k);
+                try {
+                    Field field = tClass.getDeclaredField(fieldName);
+                    if (field != null) {
+                        TableId tableId = field.getDeclaredAnnotation(TableId.class);
+                        if (tableId != null) {
+                            fieldName = tableId.value();
                         }
-                    } else if (k.endsWith("_notin")) {
-                        if (v instanceof String) {
-                            Object[] array = ((String) v).split(",");
-                            wrapper.notIn(fieldName, array);
-                        } else if (v instanceof List) {
-                            List<Object> list = (List<Object>) v;
-                            wrapper.notIn(fieldName, list);
-                        } else if (v.getClass().isArray()) {
-                            Object[] array = (Object[]) v;
-                            wrapper.notIn(fieldName, array);
+                        TableField tableField = field.getDeclaredAnnotation(TableField.class);
+                        if (tableField != null) {
+                            fieldName = tableField.value();
                         }
-                    } else if (k.endsWith("_null")) {
-                        wrapper.isNull(fieldName);
-                    } else if (k.endsWith("_notnull")) {
-                        wrapper.isNotNull(fieldName);
-                    } else if (k.endsWith("_eq")) {
-                        wrapper.eq(fieldName, v);
-                    } else if (k.endsWith("_noteq")) {
-                        wrapper.ne(fieldName, v);
-                    } else if (k.endsWith("_like")) {
-                        wrapper.like(fieldName, v);
-                    } else if (k.endsWith("_notlike")) {
-                        wrapper.notLike(fieldName, v);
-                    } else {
-                        Class<?> clazz = field.getType();
-                        if (clazz != null && clazz.equals(String.class)) {
-                            wrapper.like(fieldName, v);
-                        } else {
+                        if (k.endsWith("_lessThan")) {
+                            wrapper.lt(fieldName, v);
+                        } else if (k.endsWith("_greaterThan")) {
+                            wrapper.gt(fieldName, v);
+                        } else if (k.endsWith("_lessOrEq")) {
+                            wrapper.le(fieldName, v);
+                        } else if (k.endsWith("_greaterOrEq")) {
+                            wrapper.ge(fieldName, v);
+                        } else if (k.endsWith("_start")) {
+                            wrapper.ge(fieldName, v);
+                        } else if (k.endsWith("_end")) {
+                            wrapper.le(fieldName, v);
+                        } else if (k.endsWith("_in")) {
+                            if (v instanceof String) {
+                                Object[] array = ((String) v).split(",");
+                                wrapper.in(fieldName, array);
+                            } else if (v instanceof List) {
+                                List<Object> list = (List<Object>) v;
+                                wrapper.in(fieldName, list);
+                            } else if (v.getClass().isArray()) {
+                                Object[] array = (Object[]) v;
+                                wrapper.in(fieldName, array);
+                            }
+                        } else if (k.endsWith("_notin")) {
+                            if (v instanceof String) {
+                                Object[] array = ((String) v).split(",");
+                                wrapper.notIn(fieldName, array);
+                            } else if (v instanceof List) {
+                                List<Object> list = (List<Object>) v;
+                                wrapper.notIn(fieldName, list);
+                            } else if (v.getClass().isArray()) {
+                                Object[] array = (Object[]) v;
+                                wrapper.notIn(fieldName, array);
+                            }
+                        } else if (k.endsWith("_null")) {
+                            wrapper.isNull(fieldName);
+                        } else if (k.endsWith("_notnull")) {
+                            wrapper.isNotNull(fieldName);
+                        } else if (k.endsWith("_eq")) {
                             wrapper.eq(fieldName, v);
+                        } else if (k.endsWith("_noteq")) {
+                            wrapper.ne(fieldName, v);
+                        } else if (k.endsWith("_like")) {
+                            wrapper.like(fieldName, v);
+                        } else if (k.endsWith("_notlike")) {
+                            wrapper.notLike(fieldName, v);
+                        } else {
+                            Class<?> clazz = field.getType();
+                            if (clazz != null && clazz.equals(String.class)) {
+                                wrapper.like(fieldName, v);
+                            } else {
+                                wrapper.eq(fieldName, v);
+                            }
                         }
                     }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
                 }
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            }
-        });
+            });
+        }
         return wrapper;
     }
 

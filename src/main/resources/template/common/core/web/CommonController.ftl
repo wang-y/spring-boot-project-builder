@@ -34,8 +34,8 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
     @ApiOperation(value = "详情", notes = "根据条件查询详情")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
 </#if>
-    @PostMapping(value = "find")
-    public E find(@ApiParam @RequestBody PostRequest request) {
+    @GetMapping(value = "find")
+    public E find(PostRequest request) {
         return service.findOne(request.getQueryParams());
     }
 
@@ -43,8 +43,8 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
     @ApiOperation(value = "分页列表", notes = "根据条件查询分页列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PageRequest", paramType = "body")
 </#if>
-    @PostMapping(value = "page")
-    public SimplePage<E> page(@RequestBody PageRequest request) {
+    @GetMapping(value = "page")
+    public SimplePage<E> page(PageRequest request) {
         return service.page(request.getQueryParams(), request.getOrderBy(), request.getPage(), request.getSize());
     }
 
@@ -52,15 +52,15 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
     @ApiOperation(value = "列表", notes = "根据条件查询列表")
     @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
 </#if>
-    @PostMapping(value = "list")
-    public Collection<E> list(@RequestBody PostRequest request) {
+    @GetMapping(value = "list")
+    public Collection<E> list(PostRequest request) {
         return service.list(request.getQueryParams(), request.getOrderBy());
     }
 
 <#if enabledSwagger>
     @ApiOperation(value = "新增", notes = "添加新数据")
 </#if>
-    @PutMapping
+    @PostMapping
     public E add(@RequestBody E e) {
         return service.save(e);
     }
@@ -68,7 +68,7 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
 <#if enabledSwagger>
     @ApiOperation(value = "修改", notes = "修改数据")
 </#if>
-    @PostMapping
+    @PutMapping
     public E modify(@RequestBody E e) {
         return service.update(e);
     }

@@ -201,7 +201,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>com.${groupId}.${artifactId}.Application</mainClass>
+                    <mainClass>${groupId}.${artifactId}.Application</mainClass>
                     <executable>true</executable>
                 </configuration>
                 <executions>

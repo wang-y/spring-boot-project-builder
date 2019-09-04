@@ -1,19 +1,27 @@
 package ${confpackage};
 
-import ${corepackage}.common.interceptor.ResponseResultInterceptor;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.core.MethodParameter;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import ${corepackage}.common.body.PageRequest;
+import ${corepackage}.common.body.PostRequest;
+import ${corepackage}.common.interceptor.ResponseResultInterceptor;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -61,5 +69,43 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ResponseResultInterceptor()).excludePathPatterns("/**.html","/swagger-ui.html**","/webjars/**","/v2/api-docs","/swagger-resources/**","/swagger-resources");
     }
+	
+	@Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new PostRequestHandlerMethodArgumentResolver());
+    }
 
+    static class PostRequestHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
+        @Override
+        public boolean supportsParameter(MethodParameter parameter) {
+            return parameter.getParameterType().equals(PostRequest.class) || parameter.getParameterType().equals(PageRequest.class);
+        }
+
+        @Override
+        public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+            PostRequest postRequest;
+
+            HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+            final String queryParams = request.getParameter("queryParams");
+            final String orderBy = request.getParameter("orderBy");
+
+            if (parameter.getParameterType().equals(PostRequest.class)) {
+                postRequest = new PostRequest();
+            } else {
+                final String page = request.getParameter("page");
+                final String size = request.getParameter("size");
+                postRequest = new PageRequest(StringUtils.isEmpty(page) ? 1 : Integer.parseInt(page), StringUtils.isEmpty(size) ? 1 : Integer.parseInt(size));
+            }
+            if (StringUtils.isEmpty(queryParams)) {
+                final HashMap p = JSONObject.parseObject(queryParams, HashMap.class);
+                postRequest.setQueryParams(p);
+            }
+            if (StringUtils.isEmpty(orderBy)) {
+                final LinkedHashMap o = JSONObject.parseObject(queryParams, LinkedHashMap.class);
+                postRequest.setOrderBy(o);
+            }
+
+            return postRequest;
+        }
+    }
 }

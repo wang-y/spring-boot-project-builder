@@ -17,4 +17,12 @@ public class PageRequest extends PostRequest {
 </#if>
     private int size;
 
+    public PageRequest(int page, int size) {
+        this.page = page;
+        this.size = size;
+    }
+
+    public PageRequest() {
+
+    }
 }

@@ -2,6 +2,7 @@ package ${corepackage}.web;
 
 <#if enabledSwagger>
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 </#if>
@@ -32,7 +33,10 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
 
 <#if enabledSwagger>
     @ApiOperation(value = "详情", notes = "根据条件查询详情")
-    @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "queryParams", value = "按照json 格式填写", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderBy", value = "按照json 格式填写", dataType = "String", paramType = "query")
+    })
 </#if>
     @GetMapping(value = "find")
     public E find(PostRequest request) {
@@ -41,7 +45,12 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
 
 <#if enabledSwagger>
     @ApiOperation(value = "分页列表", notes = "根据条件查询分页列表")
-    @ApiImplicitParam(name = "request", required = true, dataType = "PageRequest", paramType = "body")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "queryParams", value = "按照json 格式填写", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderBy", value = "按照json 格式填写", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "page", value = "当前页", dataType = "Integer", paramType = "query"),
+            @ApiImplicitParam(name = "size", value = "当前页显示条数", dataType = "Integer", paramType = "query")
+    })
 </#if>
     @GetMapping(value = "page")
     public SimplePage<E> page(PageRequest request) {
@@ -50,7 +59,10 @@ public abstract class CommonController<E,ID extends Serializable,SERVICE extends
 
 <#if enabledSwagger>
     @ApiOperation(value = "列表", notes = "根据条件查询列表")
-    @ApiImplicitParam(name = "request", required = true, dataType = "PostRequest", paramType = "body")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "queryParams", value = "按照json 格式填写", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "orderBy", value = "按照json 格式填写", dataType = "String", paramType = "query")
+    })
 </#if>
     @GetMapping(value = "list")
     public Collection<E> list(PostRequest request) {

@@ -96,12 +96,12 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                 final String size = request.getParameter("size");
                 postRequest = new PageRequest(StringUtils.isEmpty(page) ? 1 : Integer.parseInt(page), StringUtils.isEmpty(size) ? 1 : Integer.parseInt(size));
             }
-            if (StringUtils.isEmpty(queryParams)) {
+            if (!StringUtils.isEmpty(queryParams)) {
                 final HashMap p = JSONObject.parseObject(queryParams, HashMap.class);
                 postRequest.setQueryParams(p);
             }
-            if (StringUtils.isEmpty(orderBy)) {
-                final LinkedHashMap o = JSONObject.parseObject(queryParams, LinkedHashMap.class);
+            if (!StringUtils.isEmpty(orderBy)) {
+                final LinkedHashMap o = JSONObject.parseObject(orderBy, LinkedHashMap.class);
                 postRequest.setOrderBy(o);
             }
 

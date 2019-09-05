@@ -162,7 +162,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
-            <version>3.1.2</version>
+            <version>${MYBATIS_PLUS_VERSION}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -194,7 +194,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.59</version>
+            <version>${FASTJSON_VERSION}</version>
         </dependency>
 
     </dependencies>

@@ -141,6 +141,7 @@ public final class CodeBuilder {
         modelData.put("SPRING_BOOT_VERSION", VersionConstants.SPRING_BOOT_VERSION);
         modelData.put("DRUID_VERSION", VersionConstants.DRUID_VERSION);
         modelData.put("MYBATIS_PLUS_VERSION", VersionConstants.MYBATIS_PLUS_VERSION);
+        modelData.put("FASTJSON_VERSION", VersionConstants.FASTJSON_VERSION);
 
         modelData.put("dockerimageprefix", "${docker.image.prefix}");
         modelData.put("projectartifactId", "${project.artifactId}");

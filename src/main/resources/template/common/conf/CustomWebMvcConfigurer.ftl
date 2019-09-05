@@ -1,5 +1,6 @@
 package ${confpackage};
 
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,9 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ${corepackage}.common.body.PageRequest;
 import ${corepackage}.common.body.PostRequest;
+import ${corepackage}.common.exception.BusinessException;
 import ${corepackage}.common.interceptor.ResponseResultInterceptor;
+import ${corepackage}.common.result.ResultCode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -96,13 +99,17 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                 final String size = request.getParameter("size");
                 postRequest = new PageRequest(StringUtils.isEmpty(page) ? 1 : Integer.parseInt(page), StringUtils.isEmpty(size) ? 1 : Integer.parseInt(size));
             }
-            if (!StringUtils.isEmpty(queryParams)) {
-                final HashMap p = JSONObject.parseObject(queryParams, HashMap.class);
-                postRequest.setQueryParams(p);
-            }
-            if (!StringUtils.isEmpty(orderBy)) {
-                final LinkedHashMap o = JSONObject.parseObject(orderBy, LinkedHashMap.class);
-                postRequest.setOrderBy(o);
+            try {
+                if (!StringUtils.isEmpty(queryParams)) {
+                    final HashMap p = JSONObject.parseObject(queryParams, HashMap.class);
+                    postRequest.setQueryParams(p);
+                }
+                if (!StringUtils.isEmpty(orderBy)) {
+                    final LinkedHashMap o = JSONObject.parseObject(orderBy, LinkedHashMap.class);
+                    postRequest.setOrderBy(o);
+                }
+            } catch (JSONException e) {
+                throw new BusinessException(ResultCode.PARAM_NOT_JSON);
             }
 
             return postRequest;

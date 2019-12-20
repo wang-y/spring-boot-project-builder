@@ -23,8 +23,8 @@ public class Main {
         System.out.println("https://github.com/wang-y/spring-boot-project-builder");
         System.out.println("-----------------------------------------------------");
         System.out.println("                                           (欢迎fork)");
-        buildProject();
-//        build();
+//        buildProject();
+        build();
     }
 
 

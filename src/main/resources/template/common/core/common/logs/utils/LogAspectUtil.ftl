@@ -1,8 +1,8 @@
 package ${corepackage}.common.logs.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.web.multipart.MultipartFile;
+import ${corepackage}.utils.JsonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LogAspectUtil {
 
     private LogAspectUtil(){
-
     }
-
-    private static ObjectMapper objectMapper;
 
     /**
      * 获取需要记录日志方法的参数，敏感参数用*代替
@@ -31,7 +28,7 @@ public class LogAspectUtil {
             return sb.toString();
         }
         for (Object arg : arguments) {
-            //移除敏感内容
+            <#if enableWeb>
             String paramStr;
             if (arg instanceof HttpServletResponse) {
                 paramStr = HttpServletResponse.class.getSimpleName();
@@ -43,6 +40,9 @@ public class LogAspectUtil {
             } else {
                 paramStr = convertObj2Str(arg);
             }
+            <#else>
+            String paramStr = convertObj2Str(arg);
+            </#if>
             sb.append(paramStr).append(",");
         }
         return sb.deleteCharAt(sb.length() - 1).toString();
@@ -55,15 +55,12 @@ public class LogAspectUtil {
      * @return 参数对象
      */
     public static String convertObj2Str(Object obj) {
-        if(objectMapper==null){
-            objectMapper = new ObjectMapper();
-        }
         if (obj == null || obj instanceof Exception) {
             return "{}";
         }
         String param;
         try {
-            param = objectMapper.writeValueAsString(obj);
+            param = JsonUtils.object2Json(obj);
         } catch (Exception e) {
             return String.valueOf(obj);
         }

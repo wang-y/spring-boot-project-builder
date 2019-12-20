@@ -24,6 +24,7 @@
     </properties>
 
     <dependencies>
+        <#if enableWeb >
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -38,8 +39,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
-
-<#if enabledSwagger>
+        <#else>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+        </dependency>
+        </#if>
+<#if enableWeb && enabledSwagger>
         <!-- swagger2 依赖 -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -90,6 +100,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <#break>
         <#case "SQLITE">
@@ -195,13 +206,6 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${FASTJSON_VERSION}</version>
-        </dependency>
-
     </dependencies>
 
     <build>

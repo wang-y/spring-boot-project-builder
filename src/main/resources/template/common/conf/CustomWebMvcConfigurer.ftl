@@ -9,8 +9,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 <#if enableDatabase>
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -19,14 +17,13 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import ${corepackage}.common.body.PageRequest;
 import ${corepackage}.common.body.PostRequest;
-import ${corepackage}.common.exception.BusinessException;
-import ${corepackage}.common.result.ResultCode;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 </#if>
 import ${corepackage}.common.interceptor.ResponseResultInterceptor;
+import ${corepackage}.utils.JsonUtils;
 
 @Slf4j
 @Configuration
@@ -99,19 +96,14 @@ public class CustomWebMvcConfigurer implements WebMvcConfigurer {
                 final String size = request.getParameter("size");
                 postRequest = new PageRequest(StringUtils.isEmpty(page) ? 1 : Integer.parseInt(page), StringUtils.isEmpty(size) ? 1 : Integer.parseInt(size));
             }
-            try {
-                if (!StringUtils.isEmpty(queryParams)) {
-                    final HashMap p = JSONObject.parseObject(queryParams, HashMap.class);
-                    postRequest.setQueryParams(p);
-                }
-                if (!StringUtils.isEmpty(orderBy)) {
-                    final LinkedHashMap o = JSONObject.parseObject(orderBy, LinkedHashMap.class);
-                    postRequest.setOrderBy(o);
-                }
-            } catch (JSONException e) {
-                throw new BusinessException(ResultCode.PARAM_NOT_JSON);
+            if (!StringUtils.isEmpty(queryParams)) {
+                final HashMap p = JsonUtils.json2Object(queryParams, HashMap.class);
+                postRequest.setQueryParams(p);
             }
-
+            if (!StringUtils.isEmpty(orderBy)) {
+                final LinkedHashMap o = JsonUtils.json2Object(orderBy, LinkedHashMap.class);
+                postRequest.setOrderBy(o);
+            }
             return postRequest;
         }
     }

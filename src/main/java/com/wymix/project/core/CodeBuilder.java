@@ -327,6 +327,7 @@ public final class CodeBuilder {
             generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/ServiceLogAspect.java", "common/core/common/logs/aspect/ServiceLogAspect.ftl");
             generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/LogAspectUtil.java", "common/core/common/logs/utils/LogAspectUtil.ftl");
 
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "utils/JsonUtils.java", "common/core/utils/JsonUtils.ftl");
             if ((boolean) this.modelData.get("enableDatabase")) {
                 if (projectConfig.enable_web) {
                     /**

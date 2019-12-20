@@ -108,43 +108,59 @@ public class Main {
 
         ProjectConfig projectConfig = ProjectConfig.project(project).customType(type).name(name).enableSwagger();
 
-        System.out.print("请输入项目占用端口(默认:8080)：");
-        String port = "";
-        while (true){
-            port = scanner.nextLine();
-            if(StringUtils.isBlank(port)){
-                break;
+        System.out.println("是否为Web项目：");
+        System.out.println("    0. 是");
+        System.out.println("    1. 否");
+        System.out.print("请选择(是)：");
+        boolean enableWeb = true;
+        String enableWebstr = scanner.nextLine();
+        if (StringUtils.isNotBlank(enableWebstr)) {
+            if (StringUtils.equals(enableWebstr, "1")) {
+                projectConfig.nonWebProject();
+                enableWeb = false;
             }
-            if(port.matches("^[0-9]\\d*$")){
-                if(Integer.parseInt(port)>=0&&Integer.parseInt(port)<=65535){
+        }
+        System.out.println("项目 [" + project + "] " + (enableWeb ? "是Web项目" : "非Web项目") + " 。\n");
+
+        if(enableWeb) {
+            System.out.print("请输入项目占用端口(默认:8080)：");
+            String port = "";
+            while (true) {
+                port = scanner.nextLine();
+                if (StringUtils.isBlank(port)) {
                     break;
-                }else{
-                    System.out.println("端口号范围: [ 0 - 65535 ] ");
+                }
+                if (port.matches("^[0-9]\\d*$")) {
+                    if (Integer.parseInt(port) >= 0 && Integer.parseInt(port) <= 65535) {
+                        break;
+                    } else {
+                        System.out.println("端口号范围: [ 0 - 65535 ] ");
+                        System.out.print("请输入项目占用端口(默认:8080)：");
+                    }
+                } else {
+                    System.out.println("输入错误，请重新输入");
                     System.out.print("请输入项目占用端口(默认:8080)：");
                 }
-            }else{
-                System.out.println("输入错误，请重新输入");
-                System.out.print("请输入项目占用端口(默认:8080)：");
             }
-        }
-        if(StringUtils.isNotBlank(port)){
-            projectConfig.setPort(Integer.parseInt(port));
-        }
-        System.out.println("项目占用端口为： [" + projectConfig.getPort() + "] 。\n");
+            if (StringUtils.isNotBlank(port)) {
+                projectConfig.setPort(Integer.parseInt(port));
+            }
+            System.out.println("项目占用端口为： [" + projectConfig.getPort() + "] 。\n");
 
-        System.out.println("是否启用Swagger2：");
-        System.out.println("    0. 禁用");
-        System.out.println("    1. 启用");
-        System.out.print("请选择(默认启用)：");
-        boolean enableSwagger2 = true;
-        String enableSwagger2str = scanner.nextLine();
-        if (StringUtils.isNotBlank(enableSwagger2str)) {
-            if (StringUtils.equals(enableSwagger2str, "0")) {
-                projectConfig.disableSwagger();
-                enableSwagger2 = false;
+            System.out.println("是否启用Swagger2：");
+            System.out.println("    0. 禁用");
+            System.out.println("    1. 启用");
+            System.out.print("请选择(默认启用)：");
+            boolean enableSwagger2 = true;
+            String enableSwagger2str = scanner.nextLine();
+            if (StringUtils.isNotBlank(enableSwagger2str)) {
+                if (StringUtils.equals(enableSwagger2str, "0")) {
+                    projectConfig.disableSwagger();
+                    enableSwagger2 = false;
+                }
             }
+            System.out.println("项目 [" + project + "] " + (enableSwagger2 ? "启用" : "禁用") + " Swagger2。\n");
         }
-        System.out.println("项目 [" + project + "] " + (enableSwagger2 ? "启用" : "禁用") + " Swagger2。\n");
 
         System.out.println("数据库类型：");
         System.out.println("    0. None");
@@ -246,7 +262,6 @@ public class Main {
             }
         }
         System.out.println("项目 [" + project + "] " + (enableDocker ? "启用" : "禁用") + " Docker。\n");
-
 
         System.out.println("开始构建 [" + project + "] 项目...");
         CodeBuilder.toFilePath(path).cmd().build(projectConfig);

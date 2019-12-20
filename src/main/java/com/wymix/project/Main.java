@@ -23,8 +23,8 @@ public class Main {
         System.out.println("https://github.com/wang-y/spring-boot-project-builder");
         System.out.println("-----------------------------------------------------");
         System.out.println("                                           (欢迎fork)");
-//        buildProject();
-        build();
+        buildProject();
+//        build();
     }
 
 
@@ -32,12 +32,12 @@ public class Main {
         ProjectConfig projectConfig = ProjectConfig.project("test").org()
                 .name("wymix")
                 .enableSwagger()
-                .setDataBaseType(DataBaseType.MYSQL)
-                .JDBCconfigure("jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC", "root", "123456")
-                .setOrmType(OrmType.JPA)
+                .setDataBaseType(DataBaseType.H2)
+                .JDBCconfigure("jdbc:h2:~/test", "sa", "sa")
+                .setOrmType(OrmType.MYBATIS)
                 .setDataBaseConnectPool(DataBaseConnectPool.HIKARICP).enableDocker();
 
-        CodeBuilder.toFilePath("C:\\MySoft\\project").build(projectConfig);
+        CodeBuilder.toFilePath("/home/username/Projects").build(projectConfig);
     }
 
 

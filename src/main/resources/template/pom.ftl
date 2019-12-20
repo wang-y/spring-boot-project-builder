@@ -171,6 +171,11 @@
             <version>2.1</version>
             <scope>test</scope>
         </dependency>
+<#else>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
 </#if>
 
         <dependency>

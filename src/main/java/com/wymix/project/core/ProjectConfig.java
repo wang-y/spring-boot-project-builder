@@ -15,9 +15,15 @@ public class ProjectConfig {
     protected String contextPath;
     protected boolean enable_swagger = true;
     protected boolean enable_docker = false;
+    protected boolean enable_web=true;
 
     private ProjectConfig() {
 
+    }
+
+    public ProjectConfig nonWebProject(){
+        this.enable_web = false;
+        return this;
     }
 
     public ProjectConfig name(String name) {

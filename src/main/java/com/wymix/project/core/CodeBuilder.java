@@ -37,9 +37,9 @@ public final class CodeBuilder {
     private String PACKAGE_CORE;
     private String BASE_PACKAGE;
 
-    public CodeBuilder cmd(){
-        TEMPLATE_FILE_PATH=PROJECT_PATH+"/../template";
-        VM_FILE_PATH=PROJECT_PATH+"/../template/generator/";
+    public CodeBuilder cmd() {
+        TEMPLATE_FILE_PATH = PROJECT_PATH + "/../template";
+        VM_FILE_PATH = PROJECT_PATH + "/../template/generator/";
         return this;
     }
 
@@ -109,7 +109,7 @@ public final class CodeBuilder {
             }
             createGenertor();
         }
-        if (projectConfig.enable_swagger) {
+        if (projectConfig.enable_web && projectConfig.enable_swagger) {
             createSwaggerConf();
         }
         if (projectConfig.enable_docker) {
@@ -130,6 +130,9 @@ public final class CodeBuilder {
         modelData.put("password", this.projectConfig.dataBaseConfig.getPassword());
         modelData.put("artifactId", this.projectConfig.project);
         modelData.put("allowed_cross_domain", "${server.allowed-cross-domain}");
+
+
+        modelData.put("enableWeb", this.projectConfig.enable_web);
 
         modelData.put("groupId", this.projectConfig.type + "." + this.projectConfig.name);
         modelData.put("enableDocker", this.projectConfig.enable_docker);
@@ -160,11 +163,11 @@ public final class CodeBuilder {
         }
     }
 
-    private void copyVm(String vmPath,String destPath) throws IOException {
+    private void copyVm(String vmPath, String destPath) throws IOException {
         File source = new File(vmPath);
         File[] files = source.listFiles();
         for (File vm : files) {
-            File temp = new File(destPath+vm.getName());
+            File temp = new File(destPath + vm.getName());
             if (!temp.getParentFile().exists()) {
                 temp.getParentFile().mkdir();
             }
@@ -178,13 +181,13 @@ public final class CodeBuilder {
     private void createGenertor() {
         try {
             if (projectConfig.dataBaseConfig.getOrmType() == OrmType.MYBATIS) {
-                generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/m_Generator.ftl");
+                generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java", "generator/m_Generator.ftl");
                 String projectPath = VM_FILE_PATH + "m_vm";
-                copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
+                copyVm(projectPath, getRoot() + "/src/main/resources/templates/");
             } else {
-                generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java","generator/j_Generator.ftl");
+                generate(getTestJavaPath() + BASE_PACKAGE_PATH + "Generator.java", "generator/j_Generator.ftl");
                 String projectPath = VM_FILE_PATH + "j_vm";
-                copyVm(projectPath,getRoot() + "/src/main/resources/templates/");
+                copyVm(projectPath, getRoot() + "/src/main/resources/templates/");
             }
         } catch (Exception e) {
             System.out.println("代码生成器生成失败！");
@@ -197,7 +200,7 @@ public final class CodeBuilder {
     private void createDockerfile() {
         String dockerPath = getRoot() + "/src/main/docker";
         try {
-            generate(dockerPath + "/Dockerfile","Dockerfile.ftl");
+            generate(dockerPath + "/Dockerfile", "Dockerfile.ftl");
         } catch (Exception e) {
             System.out.println("Dockerfile生成失败！");
             e.printStackTrace();
@@ -229,7 +232,7 @@ public final class CodeBuilder {
 
     private void createMyBatisConf() {
         try {
-            generate(getJavaPath() + PACKAGE_PATH_CONF + "MybatisConfigurer.java","mybatis/conf/MybatisConfigurer.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CONF + "MybatisConfigurer.java", "mybatis/conf/MybatisConfigurer.ftl");
         } catch (Exception e) {
             System.out.println("MyBatis配置类生成失败！");
             e.printStackTrace();
@@ -240,8 +243,8 @@ public final class CodeBuilder {
 
     private void createMyBatisCore() {
         try {
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/ServiceImpl.java","mybatis/core/service/impl/ServiceImpl.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "service/support/SearchQuerySupport.java","mybatis/core/service/support/SearchQuerySupport.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "service/impl/ServiceImpl.java", "mybatis/core/service/impl/ServiceImpl.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "service/support/SearchQuerySupport.java", "mybatis/core/service/support/SearchQuerySupport.ftl");
         } catch (Exception e) {
             System.out.println("MyBatis核心库生成失败！");
             e.printStackTrace();
@@ -271,7 +274,7 @@ public final class CodeBuilder {
 
     private void createSwaggerConf() {
         try {
-            generate(getJavaPath() + PACKAGE_PATH_CONF + "SwaggerConf.java","common/conf/SwaggerConf.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CONF + "SwaggerConf.java", "common/conf/SwaggerConf.ftl");
         } catch (Exception e) {
             System.out.println("swagger配置类生成失败！");
             e.printStackTrace();
@@ -282,62 +285,70 @@ public final class CodeBuilder {
 
     private void createCommonCore() {
         try {
-            /**
-             * request body
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PageRequest.java","common/core/common/body/PageRequest.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PostRequest.java","common/core/common/body/PostRequest.ftl");
-            /**
-             * exception
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BaseGlobalExceptionHandler.java","common/core/common/exception/BaseGlobalExceptionHandler.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BusinessException.java","common/core/common/exception/BusinessException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ConvertUtil.java","common/core/common/exception/ConvertUtil.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataConflictException.java","common/core/common/exception/DataConflictException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataNotFoundException.java","common/core/common/exception/DataNotFoundException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ExceptionEnum.java","common/core/common/exception/ExceptionEnum.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/GlobalExceptionHandler.java","common/core/common/exception/GlobalExceptionHandler.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/InternalServerException.java","common/core/common/exception/InternalServerException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ParameterInvalidException.java","common/core/common/exception/ParameterInvalidException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/PermissionForbiddenException.java","common/core/common/exception/PermissionForbiddenException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/RemoteAccessException.java","common/core/common/exception/RemoteAccessException.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/UserNotLoginException.java","common/core/common/exception/UserNotLoginException.ftl");
-            /**
-             * interceptor
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/interceptor/ResponseResultInterceptor.java","common/core/common/interceptor/ResponseResultInterceptor.ftl");
-            /**
-             * result
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/DefaultErrorResult.java","common/core/common/result/DefaultErrorResult.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ParameterInvalidItem.java","common/core/common/result/ParameterInvalidItem.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/PlatformResult.java","common/core/common/result/PlatformResult.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResult.java","common/core/common/result/ResponseResult.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResultHandler.java","common/core/common/result/ResponseResultHandler.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/Result.java","common/core/common/result/Result.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResultCode.java","common/core/common/result/ResultCode.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/RequestContextHolderUtil.java","common/core/common/RequestContextHolderUtil.ftl");
+
+            if (this.projectConfig.enable_web) {
+                /**
+                 * exception
+                 */
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BaseGlobalExceptionHandler.java", "common/core/common/exception/BaseGlobalExceptionHandler.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/BusinessException.java", "common/core/common/exception/BusinessException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ConvertUtil.java", "common/core/common/exception/ConvertUtil.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataConflictException.java", "common/core/common/exception/DataConflictException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/DataNotFoundException.java", "common/core/common/exception/DataNotFoundException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ExceptionEnum.java", "common/core/common/exception/ExceptionEnum.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/GlobalExceptionHandler.java", "common/core/common/exception/GlobalExceptionHandler.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/InternalServerException.java", "common/core/common/exception/InternalServerException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/ParameterInvalidException.java", "common/core/common/exception/ParameterInvalidException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/PermissionForbiddenException.java", "common/core/common/exception/PermissionForbiddenException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/RemoteAccessException.java", "common/core/common/exception/RemoteAccessException.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/exception/UserNotLoginException.java", "common/core/common/exception/UserNotLoginException.ftl");
+                /**
+                 * interceptor
+                 */
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/interceptor/ResponseResultInterceptor.java", "common/core/common/interceptor/ResponseResultInterceptor.ftl");
+                /**
+                 * result
+                 */
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/DefaultErrorResult.java", "common/core/common/result/DefaultErrorResult.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ParameterInvalidItem.java", "common/core/common/result/ParameterInvalidItem.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/PlatformResult.java", "common/core/common/result/PlatformResult.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResult.java", "common/core/common/result/ResponseResult.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResponseResultHandler.java", "common/core/common/result/ResponseResultHandler.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/Result.java", "common/core/common/result/Result.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/result/ResultCode.java", "common/core/common/result/ResultCode.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/RequestContextHolderUtil.java", "common/core/common/RequestContextHolderUtil.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/RestControllerAspect.java", "common/core/common/logs/aspect/RestControllerAspect.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/IpUtil.java", "common/core/common/logs/utils/IpUtil.ftl");
+            }
             /**
              * logs
              */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/annotations/ServiceLog.java","common/core/common/logs/annotations/ServiceLog.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/RestControllerAspect.java","common/core/common/logs/aspect/RestControllerAspect.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/ServiceLogAspect.java","common/core/common/logs/aspect/ServiceLogAspect.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/IpUtil.java","common/core/common/logs/utils/IpUtil.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/LogAspectUtil.java","common/core/common/logs/utils/LogAspectUtil.ftl");
-            /**
-             * page
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "page/PageInfo.java","common/core/page/PageInfo.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "page/SimplePage.java","common/core/page/SimplePage.ftl");
-            /**
-             * service
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "service/IService.java","common/core/service/IService.ftl");
-            /**
-             * CommonController
-             */
-            generate(getJavaPath() + PACKAGE_PATH_CORE + "web/CommonController.java","common/core/web/CommonController.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/annotations/ServiceLog.java", "common/core/common/logs/annotations/ServiceLog.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/aspect/ServiceLogAspect.java", "common/core/common/logs/aspect/ServiceLogAspect.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CORE + "common/logs/utils/LogAspectUtil.java", "common/core/common/logs/utils/LogAspectUtil.ftl");
+
+            if ((boolean) this.modelData.get("enableDatabase")) {
+                if (projectConfig.enable_web) {
+                    /**
+                     * request body
+                     */
+                    generate(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PageRequest.java", "common/core/common/body/PageRequest.ftl");
+                    generate(getJavaPath() + PACKAGE_PATH_CORE + "common/body/PostRequest.java", "common/core/common/body/PostRequest.ftl");
+                    /**
+                     * CommonController
+                     */
+                    generate(getJavaPath() + PACKAGE_PATH_CORE + "web/CommonController.java", "common/core/web/CommonController.ftl");
+                }
+                /**
+                 * page
+                 */
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "page/PageInfo.java", "common/core/page/PageInfo.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "page/SimplePage.java", "common/core/page/SimplePage.ftl");
+                /**
+                 * service
+                 */
+                generate(getJavaPath() + PACKAGE_PATH_CORE + "service/IService.java", "common/core/service/IService.ftl");
+            }
         } catch (Exception e) {
             System.out.println("通用核心库生成失败！");
             e.printStackTrace();
@@ -348,9 +359,11 @@ public final class CodeBuilder {
 
     private void createCommonConf() {
         try {
-            generate(getJavaPath() + PACKAGE_PATH_CONF + "CustomWebMvcConfigurer.java","common/conf/CustomWebMvcConfigurer.ftl");
-            generate(getJavaPath() + PACKAGE_PATH_CONF + "OpenBrowserCommandRunner.java","common/conf/OpenBrowserCommandRunner.ftl");
-            generate(getResourcePath() + "static/home.html","home.ftl");
+            if (this.projectConfig.enable_web) {
+                generate(getJavaPath() + PACKAGE_PATH_CONF + "CustomWebMvcConfigurer.java", "common/conf/CustomWebMvcConfigurer.ftl");
+                generate(getJavaPath() + PACKAGE_PATH_CONF + "OpenBrowserCommandRunner.java", "common/conf/OpenBrowserCommandRunner.ftl");
+                generate(getResourcePath() + "static/home.html", "home.ftl");
+            }
         } catch (Exception e) {
             System.out.println("通用配置类生成失败！");
             e.printStackTrace();
@@ -361,7 +374,7 @@ public final class CodeBuilder {
 
     private void createJPAConf() {
         try {
-            generate(getJavaPath() + PACKAGE_PATH_CONF + "JpaConfigurer.java","jpa/conf/JpaConfigurer.ftl");
+            generate(getJavaPath() + PACKAGE_PATH_CONF + "JpaConfigurer.java", "jpa/conf/JpaConfigurer.ftl");
         } catch (Exception e) {
             System.out.println("JPA配置类生成失败！");
             e.printStackTrace();
@@ -385,7 +398,11 @@ public final class CodeBuilder {
 
     private void createStarter() {
         try {
-            generate(getJavaPath() + BASE_PACKAGE_PATH + "Application.java", "Application.ftl");
+            if (this.projectConfig.enable_web) {
+                generate(getJavaPath() + BASE_PACKAGE_PATH + "Application.java", "WebApplication.ftl");
+            } else {
+                generate(getJavaPath() + BASE_PACKAGE_PATH + "Application.java", "NonWebApplication.ftl");
+            }
         } catch (Exception e) {
             System.out.println("启动类 Application.java 生成失败！");
             e.printStackTrace();
@@ -441,7 +458,7 @@ public final class CodeBuilder {
         System.out.println("项目目录创建完毕！");
     }
 
-    private void mkdir(String path){
+    private void mkdir(String path) {
         File file = new File(path);
         if (!file.exists()) {
             file.mkdir();

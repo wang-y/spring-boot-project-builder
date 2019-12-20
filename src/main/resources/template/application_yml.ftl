@@ -1,22 +1,27 @@
+<#if enableWeb>
 server:
   port: ${port}
   servlet:
     context-path: /${artifactId}
   allowed-cross-domain: true
-
+</#if>
 spring:
   application:
     name: ${artifactId}
+<#if enableWeb>
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+</#if>
   aop:
     proxy-target-class: true
+<#if enableWeb>
   mvc:
     throw-exception-if-no-handler-found: true
   resources:
     add-mappings: false
+</#if>
   profiles:
     active: dev
 <#if enableDatabase>

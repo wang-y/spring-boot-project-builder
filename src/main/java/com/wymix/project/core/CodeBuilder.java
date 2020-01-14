@@ -81,7 +81,7 @@ public final class CodeBuilder {
     public void build(ProjectConfig projectConfig) {
         this.projectConfig = projectConfig;
         checkConfig();
-        String basepackage = projectConfig.type + "." + projectConfig.name + "." + projectConfig.project;
+        String basepackage = projectConfig.type + "." + projectConfig.name + "." + projectConfig.project.replaceAll("-", ".").replaceAll("_", ".");
         PACKAGE_CONF = basepackage + ".conf";
         PACKAGE_CORE = basepackage + ".core";
         BASE_PACKAGE = basepackage;
